@@ -1,0 +1,26 @@
+{
+  "last_template": "amazonq_mcp.json",
+  "output_directory": "generated",
+  "selections": {
+    "claude_code_mcp.json": [
+      "ref",
+      "exa",
+      "sequential-thinking"
+    ],
+    "amazonq_mcp.json": [
+      "ref",
+      "exa",
+      "sequential-thinking"
+    ]
+  },
+  "location_type": "windows",
+  "last_batch_server": "amazonq_mcp.json",
+  "selected_llm": "codex_config.toml",
+  "selected_mcp_servers": [
+    "context7",
+    "browserbase",
+    "exa",
+    "playwright-mcp"
+  ],
+  "last_batch_llm": null
+}

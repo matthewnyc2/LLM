@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "mcp__exa__web_search_exa",
+      "Bash(python -m py_compile:*)",
+      "Bash(python test_detect_from_different_dir.py:*)",
+      "mcp__ref__ref_search_documentation",
+      "mcp__ref__ref_read_url",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:google-gemini.github.io)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:awslabs.github.io)",
+      "WebFetch(domain:supabase.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

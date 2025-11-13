@@ -1,0 +1,10 @@
+{
+  "cli": "codex_config.toml",
+  "selected_servers": [
+    "context7",
+    "desktop-commander",
+    "sequential-thinking",
+    "zen"
+  ],
+  "timestamp": "2025-11-11T06:47:02.438248"
+}

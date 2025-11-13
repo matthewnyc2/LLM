@@ -1,0 +1,655 @@
+#!/usr/bin/env python3
+"""Utility for assembling MCP server configuration files for multiple apps."""
+
+import copy
+import json
+import os
+import shutil
+import subprocess
+import sys
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Sequence, Set
+
+CONFIG_DIR = Path(__file__).resolve().parent
+SERVERS_DIR = CONFIG_DIR / "servers"
+OUTPUT_DIR = CONFIG_DIR / "generated"
+CONFIG_PATH = CONFIG_DIR / "config.json"
+HISTORY_PATH = CONFIG_DIR / "history.log"
+
+DEFAULT_CONFIG = {
+    "selected_llm": None,
+    "selected_mcp_servers": [],
+    "output_directory": "generated",
+    "location_type": "windows",
+    "last_batch_llm": None,
+}
+
+LLM_DISPLAY_NAMES = {
+    "amazonq_mcp.json": "Amazon Q",
+    "claude_code_mcp.json": "Claude Code (VSCode)",
+    "claude_desktop_config.json": "Claude Desktop",
+    "cline_mcp_settings.json": "Cline",
+    "gemini_cli_mcp.json": "Gemini CLI",
+    "github_copilot_mcp.json": "GitHub Copilot",
+    "kilo_code_mcp.json": "Kilo (Cursor fork)",
+    "opencode_config.json": "Opencode",
+    "roo_code_mcp.json": "Roo Code",
+    "codex_config.toml": "Codex",
+}
+
+CLI_LAUNCH_COMMANDS = {
+    "amazonq_mcp.json": "q2",
+    "claude_code_mcp.json": "claude",
+    "claude_desktop_config.json": "claude",
+    "cline_mcp_settings.json": "cline",
+    "gemini_cli_mcp.json": "gemini",
+    "kilo_code_mcp.json": "kilocode",
+    "opencode_config.json": "opencode",
+    "codex_config.toml": "codex",
+}
+
+APP_LOCATIONS = {
+    "windows": {
+        "amazonq_mcp.json": r"C:\Users\matt\.aws\amazonq\mcp.json",
+        "claude_code_mcp.json": r"C:\Users\matt\.claude.json",
+        "claude_desktop_config.json": r"C:\Users\matt\AppData\Roaming\Claude\claude_desktop_config.json",
+        "cline_mcp_settings.json": r"%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json",
+        "gemini_cli_mcp.json": r"C:\Users\matt\.gemini\settings.json",
+        "github_copilot_mcp.json": r"C:\Users\matt\AppData\Roaming\Code\User\settings.json",
+        "kilo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\settings\mcp_settings.json",
+        "opencode_config.json": r"C:\Users\matt\.config\opencode\opencode.json",
+        "roo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\rooveterinaryinc.roo-cline\settings\cline_mcp_settings.json",
+        "codex_config.toml": r"%USERPROFILE%\.codex\config.toml",
+    },
+    "unix": {
+        "amazonq_mcp.json": "~/.aws/amazonq/mcp.json",
+        "claude_code_mcp.json": "~/.claude.json",
+        "claude_desktop_config.json": "~/Library/Application Support/Claude/claude_desktop_config.json",
+        "cline_mcp_settings.json": "~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
+        "gemini_cli_mcp.json": "~/.gemini/settings.json",
+        "github_copilot_mcp.json": "~/.config/Code/User/settings.json",
+        "kilo_code_mcp.json": "~/.config/Code/User/globalStorage/kilocode.kilo-code/settings/mcp_settings.json",
+        "opencode_config.json": "~/.config/opencode/opencode.json",
+        "roo_code_mcp.json": "~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/cline_mcp_settings.json",
+        "codex_config.toml": "~/.codex/config.toml",
+    },
+    "project": {
+        "amazonq_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.amazonq\mcp.json",
+        "claude_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.mcp.json",
+        "claude_desktop_config.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.claude_desktop_config.json",
+        "cline_mcp_settings.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.clinerules",
+        "gemini_cli_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.gemini\settings.json",
+        "github_copilot_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.vscode\mcp.json",
+        "kilo_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.kilocode\mcp.json",
+        "opencode_config.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\opencode.json",
+        "roo_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.roo\mcp.json",
+        "codex_config.toml": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.codex\config.toml",
+    },
+}
+
+
+@dataclass
+class LLMTemplate:
+    """Represents a configuration template for a particular LLM."""
+    
+    filename: str
+    display_name: str
+    path: Path
+    format: str  # json or toml
+    metadata: Dict[str, object]
+    container_key: Optional[str] = None
+    header_lines: Optional[List[str]] = None
+
+    def render(self, server_configs: Dict[str, object]) -> str:
+        """Render the template with the given server configurations."""
+        
+        if self.format == "json":
+            payload = copy.deepcopy(self.metadata)
+            if self.container_key is None:
+                raise RuntimeError("JSON template missing container key")
+            payload[self.container_key] = server_configs
+            return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+
+        if self.format == "toml":
+            lines: List[str] = []
+            if self.header_lines:
+                lines.extend(self.header_lines)
+                if self.header_lines and self.header_lines[-1].strip():
+                    lines.append("")
+            
+            for server_name, server_lines in server_configs.items():
+                if isinstance(server_lines, list):
+                    lines.extend(server_lines)
+                    if server_lines and server_lines[-1].strip():
+                        lines.append("")
+            
+            while lines and not lines[-1].strip():
+                lines.pop()
+            return "\n".join(lines) + "\n"
+
+        raise ValueError(f"Unsupported format: {self.format}")
+
+
+def ensure_environment() -> None:
+    """Ensure directories and default files exist."""
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    SERVERS_DIR.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    if not CONFIG_PATH.exists():
+        save_config(DEFAULT_CONFIG)
+    if not HISTORY_PATH.exists():
+        HISTORY_PATH.touch()
+
+
+def load_config() -> Dict[str, object]:
+    try:
+        with CONFIG_PATH.open("r", encoding="utf-8") as handle:
+            config = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        config = copy.deepcopy(DEFAULT_CONFIG)
+    
+    for key, default_value in DEFAULT_CONFIG.items():
+        config.setdefault(key, default_value)
+    
+    return config
+
+
+def save_config(config: Dict[str, object]) -> None:
+    with CONFIG_PATH.open("w", encoding="utf-8") as handle:
+        json.dump(config, handle, indent=2)
+
+
+def log_history(event: str, details: Optional[Dict[str, object]] = None) -> None:
+    entry = {
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "event": event,
+        "details": details or {},
+    }
+    try:
+        with HISTORY_PATH.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry) + "\n")
+    except OSError:
+        pass
+
+
+def display_history() -> None:
+    print("\n--- History Log ---")
+    try:
+        with HISTORY_PATH.open("r", encoding="utf-8") as handle:
+            for raw_line in handle:
+                line = raw_line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    print(line)
+                    continue
+                timestamp = entry.get("timestamp", "?")
+                event = entry.get("event", "?")
+                details = entry.get("details", {})
+                print(f"[{timestamp}] {event}: {details}")
+    except OSError as exc:
+        print(f"Unable to read history: {exc}")
+    print("-------------------\n")
+    input("\nPress Enter to continue...")
+
+
+def load_json_template(path: Path) -> tuple[LLMTemplate, Dict[str, object]]:
+    """Load a JSON template and return both the template and available servers."""
+    with path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+
+    container_key = None
+    for key in ("mcpServers", "mcp_servers", "mcp"):
+        if key in data:
+            container_key = key
+            break
+    if container_key is None:
+        raise ValueError(f"Could not locate MCP server container in {path}")
+
+    servers = data[container_key]
+    if not isinstance(servers, dict):
+        raise ValueError(f"Unexpected server container type in {path}")
+
+    metadata = {key: value for key, value in data.items() if key != container_key}
+    
+    template = LLMTemplate(
+        filename=path.name,
+        display_name=LLM_DISPLAY_NAMES.get(path.name, path.stem.replace("_", " ").title()),
+        path=path,
+        format="json",
+        metadata=metadata,
+        container_key=container_key,
+    )
+    
+    return template, servers
+
+
+def load_toml_template(path: Path) -> tuple[LLMTemplate, Dict[str, object]]:
+    """Load a TOML template and return both the template and available servers."""
+    header_lines: List[str] = []
+    server_blocks: Dict[str, List[str]] = {}
+
+    current_name: Optional[str] = None
+    current_block: List[str] = []
+
+    with path.open("r", encoding="utf-8") as handle:
+        for raw_line in handle:
+            line = raw_line.rstrip("\n")
+            if current_name is None:
+                if line.startswith("[mcp_servers."):
+                    current_name = line[len("[mcp_servers.") :].rstrip("]")
+                    current_block = [line]
+                else:
+                    header_lines.append(line)
+            else:
+                if line.startswith("[mcp_servers."):
+                    server_blocks[current_name] = current_block
+                    current_name = line[len("[mcp_servers.") :].rstrip("]")
+                    current_block = [line]
+                else:
+                    current_block.append(line)
+
+    if current_name is not None:
+        server_blocks[current_name] = current_block
+
+    while header_lines and not header_lines[-1].strip():
+        header_lines.pop()
+
+    template = LLMTemplate(
+        filename=path.name,
+        display_name=LLM_DISPLAY_NAMES.get(path.name, path.stem.replace("_", " ").title()),
+        path=path,
+        format="toml",
+        metadata={},
+        header_lines=header_lines,
+    )
+    
+    return template, server_blocks
+
+
+def load_all_llms_and_servers() -> tuple[List[LLMTemplate], Dict[str, object]]:
+    """Load all LLM templates and aggregate all available MCP servers."""
+    llms: List[LLMTemplate] = []
+    all_servers: Dict[str, object] = {}
+    
+    for path in sorted(SERVERS_DIR.iterdir()):
+        if not path.is_file():
+            continue
+        if path.suffix.lower() not in {".json", ".toml"}:
+            continue
+        try:
+            if path.suffix.lower() == ".json":
+                template, servers = load_json_template(path)
+            else:
+                template, servers = load_toml_template(path)
+            
+            llms.append(template)
+            # Merge servers, keeping the first occurrence of each server
+            for server_name, server_config in servers.items():
+                if server_name not in all_servers:
+                    all_servers[server_name] = server_config
+        except ValueError as exc:
+            print(f"Skipping {path.name}: {exc}")
+            continue
+    
+    return llms, all_servers
+
+
+def select_llm(llms: List[LLMTemplate], config: Dict[str, object]) -> None:
+    """Show LLM selection screen."""
+    print("\n=== Select LLM ===")
+    print("\nAvailable LLMs:")
+    
+    current_llm = config.get("selected_llm")
+    for idx, llm in enumerate(llms, start=1):
+        marker = " (current)" if llm.filename == current_llm else ""
+        print(f"  {idx}. {llm.display_name}{marker}")
+    
+    choice = input("\nSelect LLM (or press Enter to go back): ").strip()
+    if not choice:
+        return
+    
+    if choice.isdigit():
+        index = int(choice)
+        if 1 <= index <= len(llms):
+            selected = llms[index - 1]
+            config["selected_llm"] = selected.filename
+            save_config(config)
+            print(f"\nSelected: {selected.display_name}")
+        else:
+            print("Invalid selection.")
+    else:
+        print("Invalid selection.")
+
+
+def select_mcp_servers(all_servers: Dict[str, object], config: Dict[str, object]) -> None:
+    """Show MCP server selection screen."""
+    server_names = sorted(all_servers.keys())
+    selected_servers = set(config.get("selected_mcp_servers", []))
+    
+    while True:
+        print("\n=== Select MCP Servers ===")
+        for idx, name in enumerate(server_names, start=1):
+            mark = "[x]" if name in selected_servers else "[ ]"
+            print(f"  {idx:>2}. {mark} {name}")
+        
+        print("\n  A. Toggle all")
+        print("  X. Return to main menu")
+        
+        choice = input("\nSelect entry to toggle: ").strip().lower()
+        if choice == "x":
+            break
+        if choice == "a":
+            if len(selected_servers) == len(server_names):
+                selected_servers.clear()
+            else:
+                selected_servers = set(server_names)
+            continue
+        if choice.isdigit():
+            idx = int(choice)
+            if 1 <= idx <= len(server_names):
+                name = server_names[idx - 1]
+                if name in selected_servers:
+                    selected_servers.remove(name)
+                else:
+                    selected_servers.add(name)
+                continue
+        print("Invalid selection.")
+    
+    config["selected_mcp_servers"] = list(selected_servers)
+    save_config(config)
+
+
+def launch_llm(llms: List[LLMTemplate], all_servers: Dict[str, object], config: Dict[str, object]) -> None:
+    """Update configuration and launch the selected LLM."""
+    selected_llm_filename = config.get("selected_llm")
+    if not selected_llm_filename:
+        print("\nNo LLM selected. Please select an LLM first.")
+        input("Press Enter to continue...")
+        return
+    
+    # Find the selected LLM template
+    selected_llm = None
+    for llm in llms:
+        if llm.filename == selected_llm_filename:
+            selected_llm = llm
+            break
+    
+    if not selected_llm:
+        print(f"\nError: Could not find LLM template for {selected_llm_filename}")
+        input("Press Enter to continue...")
+        return
+    
+    # Get selected servers
+    selected_server_names = config.get("selected_mcp_servers", [])
+    if not selected_server_names:
+        print("\nNo MCP servers selected. Launching with empty configuration.")
+    
+    # Build server configuration with only selected servers
+    server_config = {}
+    for server_name in selected_server_names:
+        if server_name in all_servers:
+            server_config[server_name] = all_servers[server_name]
+    
+    # Generate configuration
+    output_directory = Path(CONFIG_DIR) / config.get("output_directory", "generated")
+    output_directory.mkdir(parents=True, exist_ok=True)
+    
+    output_path = output_directory / selected_llm.filename
+    document = selected_llm.render(server_config)
+    
+    with output_path.open("w", encoding="utf-8") as handle:
+        handle.write(document)
+    
+    # Copy to app-specific location
+    location_type = config.get("location_type", "windows")
+    locations = APP_LOCATIONS.get(location_type, {})
+    
+    if selected_llm.filename in locations:
+        app_location_raw = locations[selected_llm.filename]
+        app_location = Path(os.path.expandvars(app_location_raw))
+        app_location.parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            shutil.copy2(output_path, app_location)
+            print(f"\nConfiguration updated at: {app_location}")
+        except Exception as exc:
+            print(f"\nFailed to copy configuration: {exc}")
+    
+    # Launch the LLM interactively
+    cmd = CLI_LAUNCH_COMMANDS.get(selected_llm.filename)
+    if not cmd:
+        print(f"\nNo launch command configured for {selected_llm.display_name}")
+        input("Press Enter to continue...")
+        return
+    
+    print(f"\nLaunching {selected_llm.display_name}...")
+    log_history("launch_llm", {
+        "llm": selected_llm.filename,
+        "servers": selected_server_names,
+        "command": cmd
+    })
+    
+    try:
+        # Launch interactively (wait for it to complete)
+        if sys.platform == "win32":
+            # Use subprocess.run for interactive mode on Windows
+            result = subprocess.run(cmd, shell=True)
+            if result.returncode != 0:
+                print(f"\n{selected_llm.display_name} exited with code {result.returncode}")
+        else:
+            # On Unix-like systems, launch interactively
+            result = subprocess.run([cmd])
+            if result.returncode != 0:
+                print(f"\n{selected_llm.display_name} exited with code {result.returncode}")
+    except FileNotFoundError:
+        print(f"\nCommand not found: {cmd}")
+        print("Make sure the application is installed and in your PATH.")
+    except Exception as exc:
+        print(f"\nFailed to launch: {exc}")
+    
+    input("\nPress Enter to continue...")
+
+
+def batch_commands(llms: List[LLMTemplate], all_servers: Dict[str, object], config: Dict[str, object]) -> None:
+    """Batch command execution mode - non-interactive."""
+    print("\n=== Batch Commands ===")
+    print("Enter a command to execute in batch mode (non-interactive).")
+    print("Press Enter without a command to return to main menu.\n")
+    
+    while True:
+        cmd = input("Enter command (or press Enter to exit): ").strip()
+        if not cmd:
+            break
+        
+        # Get last used LLM or current selection as default
+        default_llm_filename = config.get("last_batch_llm") or config.get("selected_llm")
+        default_llm = None
+        default_index = None
+        
+        if default_llm_filename:
+            for idx, llm in enumerate(llms):
+                if llm.filename == default_llm_filename:
+                    default_llm = llm
+                    default_index = idx
+                    break
+        
+        # Show LLM selection
+        print("\nSelect LLM to execute command:")
+        for idx, llm in enumerate(llms, start=1):
+            marker = f" (press Enter for this)" if default_llm and llm.filename == default_llm.filename else ""
+            print(f"  {idx}. {llm.display_name}{marker}")
+        
+        if default_llm:
+            choice = input(f"\nSelect LLM [default: {default_llm.display_name}]: ").strip()
+        else:
+            choice = input("\nSelect LLM: ").strip()
+        
+        # Process selection
+        selected_llm = None
+        if not choice and default_llm:
+            selected_llm = default_llm
+        elif choice.isdigit():
+            index = int(choice)
+            if 1 <= index <= len(llms):
+                selected_llm = llms[index - 1]
+        
+        if not selected_llm:
+            print("Invalid selection. Command cancelled.")
+            continue
+        
+        # Save as last batch LLM
+        config["last_batch_llm"] = selected_llm.filename
+        save_config(config)
+        
+        # Get selected servers and generate config
+        selected_server_names = config.get("selected_mcp_servers", [])
+        server_config = {}
+        for server_name in selected_server_names:
+            if server_name in all_servers:
+                server_config[server_name] = all_servers[server_name]
+        
+        # Generate and deploy configuration
+        output_directory = Path(CONFIG_DIR) / config.get("output_directory", "generated")
+        output_directory.mkdir(parents=True, exist_ok=True)
+        output_path = output_directory / selected_llm.filename
+        
+        document = selected_llm.render(server_config)
+        with output_path.open("w", encoding="utf-8") as handle:
+            handle.write(document)
+        
+        # Copy to app location
+        location_type = config.get("location_type", "windows")
+        locations = APP_LOCATIONS.get(location_type, {})
+        
+        if selected_llm.filename in locations:
+            app_location_raw = locations[selected_llm.filename]
+            app_location = Path(os.path.expandvars(app_location_raw))
+            app_location.parent.mkdir(parents=True, exist_ok=True)
+            
+            try:
+                shutil.copy2(output_path, app_location)
+                print(f"Configuration deployed to: {app_location}")
+            except Exception as exc:
+                print(f"Failed to copy configuration: {exc}")
+        
+        # Execute command in batch mode (non-interactive, capture output)
+        print(f"\nExecuting in batch mode with {selected_llm.display_name}: {cmd}")
+        log_history("batch_command", {
+            "llm": selected_llm.filename,
+            "command": cmd,
+            "servers": selected_server_names
+        })
+        
+        try:
+            # Run in batch mode - capture output and don't interact
+            result = subprocess.run(
+                cmd, 
+                shell=True, 
+                capture_output=True, 
+                text=True,
+                timeout=300  # 5 minute timeout for batch commands
+            )
+            
+            # Display output
+            if result.stdout:
+                print("\n--- Output ---")
+                print(result.stdout)
+            if result.stderr:
+                print("\n--- Errors ---")
+                print(result.stderr)
+            
+            if result.returncode != 0:
+                print(f"\nCommand exited with code {result.returncode}")
+            else:
+                print("\nCommand completed successfully.")
+                
+        except subprocess.TimeoutExpired:
+            print("\nCommand timed out after 5 minutes.")
+        except Exception as exc:
+            print(f"\nError executing command: {exc}")
+        
+        print()
+
+
+def main_menu(llms: List[LLMTemplate], all_servers: Dict[str, object], config: Dict[str, object]) -> None:
+    """Display the main menu."""
+    while True:
+        # Clear screen (optional, uncomment if desired)
+        # os.system('cls' if os.name == 'nt' else 'clear')
+        
+        print("\n" + "="*50)
+        print("MCP Configuration Manager")
+        print("="*50)
+        
+        # Show current selections
+        selected_llm_filename = config.get("selected_llm")
+        if selected_llm_filename:
+            selected_llm = next((llm for llm in llms if llm.filename == selected_llm_filename), None)
+            if selected_llm:
+                print(f"\nLLM: {selected_llm.display_name}")
+        else:
+            print("\nLLM: None selected")
+        
+        selected_servers = config.get("selected_mcp_servers", [])
+        if selected_servers:
+            print(f"MCP Servers: {', '.join(selected_servers[:3])}", end="")
+            if len(selected_servers) > 3:
+                print(f" (+{len(selected_servers)-3} more)")
+            else:
+                print()
+        else:
+            print("MCP Servers: None selected")
+        
+        print("\n" + "-"*50)
+        print("\nOptions:")
+        print("  1. Select LLM")
+        print("  2. Select MCP Servers")
+        print("  3. Launch LLM")
+        print("  4. Batch Commands")
+        print("  5. History")
+        print("  6. Exit")
+        
+        choice = input("\nSelect option: ").strip()
+        
+        if choice == "1":
+            select_llm(llms, config)
+        elif choice == "2":
+            select_mcp_servers(all_servers, config)
+        elif choice == "3":
+            launch_llm(llms, all_servers, config)
+        elif choice == "4":
+            batch_commands(llms, all_servers, config)
+        elif choice == "5":
+            display_history()
+        elif choice == "6":
+            print("\nGoodbye!")
+            break
+        else:
+            print("\nInvalid option. Please try again.")
+
+
+def main() -> None:
+    ensure_environment()
+    
+    # Load all LLMs and aggregate all servers
+    llms, all_servers = load_all_llms_and_servers()
+    
+    if not llms:
+        print(f"No LLM templates found in {SERVERS_DIR}")
+        return
+    
+    if not all_servers:
+        print("No MCP servers found in any templates")
+        return
+    
+    config = load_config()
+    main_menu(llms, all_servers, config)
+
+
+if __name__ == "__main__":
+    main()
