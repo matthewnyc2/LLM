@@ -1,0 +1,10 @@
+{
+  "cli": "claude_code_mcp.json",
+  "selected_servers": [
+    "context7",
+    "desktop-commander",
+    "playwright",
+    "zen"
+  ],
+  "timestamp": "2025-11-11T03:50:24.312387"
+}

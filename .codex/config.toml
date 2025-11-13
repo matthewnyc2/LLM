@@ -1,0 +1,17 @@
+[mcp_servers.context7]
+type = "http"
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.desktop-commander]
+type = "stdio"
+command = "npx"
+args = ["-y", "@wonderwhy-er/desktop-commander"]
+
+[mcp_servers.sequential-thinking]
+type = "http"
+url = "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
+
+[mcp_servers.zen]
+type = "stdio"
+command = "uvx"
+args = ["zen-mcp"]

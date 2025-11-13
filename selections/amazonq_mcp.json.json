@@ -1,0 +1,13 @@
+{
+  "cli": "amazonq_mcp.json",
+  "selected_servers": [
+    "context7",
+    "desktop-commander",
+    "gemini-cli-server",
+    "playwright",
+    "ref",
+    "sequential-thinking",
+    "zen"
+  ],
+  "timestamp": "2025-11-11T04:21:56.973625"
+}

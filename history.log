@@ -1,0 +1,36 @@
+{"timestamp": "2025-11-07T00:23:15", "event": "generate_config", "details": {"template": "claude_code_mcp.json", "output": "/workspace/MAILSHIELD/LLM/generated/claude_code_mcp.json", "servers": ["supabase", "ref", "exa", "sequential-thinking", "browserbase", "notion", "clear-thought-mcp", "gmail-mcp", "playwright-mcp"]}}
+{"timestamp": "2025-11-06T19:27:44", "event": "generate_config", "details": {"template": "amazonq_mcp.json", "output": "C:\\Users\\matt\\Dropbox\\projects\\MAILSHIELD\\LLM\\generated\\amazonq_mcp.json", "servers": ["ref", "exa", "sequential-thinking"]}}
+{"timestamp": "2025-11-06T19:27:44", "event": "launch_llm", "details": {"template": "amazonq_mcp.json", "command": "q"}}
+{"timestamp": "2025-11-06T19:28:28", "event": "generate_config", "details": {"template": "amazonq_mcp.json", "output": "C:\\Users\\matt\\Dropbox\\projects\\MAILSHIELD\\LLM\\generated\\amazonq_mcp.json", "servers": ["ref", "exa", "sequential-thinking"]}}
+{"timestamp": "2025-11-06T19:28:32", "event": "launch_llm", "details": {"template": "amazonq_mcp.json", "command": "q"}}
+{"timestamp": "2025-11-06T19:41:42", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa", "sequential-thinking"], "command": "q"}}
+{"timestamp": "2025-11-06T19:45:18", "event": "update_llm_config", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa", "sequential-thinking"]}}
+{"timestamp": "2025-11-06T19:47:07", "event": "launch_llm", "details": {"template": "amazonq_mcp.json", "command": "q"}}
+{"timestamp": "2025-11-06T19:47:43", "event": "batch_command", "details": {"template": "amazonq_mcp.json", "command": "search online for 10 commands to put guardrails on LLMs"}}
+{"timestamp": "2025-11-06T19:48:49", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa", "sequential-thinking"], "command": "q"}}
+{"timestamp": "2025-11-06T19:50:00", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa", "sequential-thinking"], "command": "q2"}}
+{"timestamp": "2025-11-06T19:50:50", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["sequential-thinking", "exa", "ref"], "command": "q2"}}
+{"timestamp": "2025-11-06T19:58:28", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["sequential-thinking", "exa", "ref"], "command": "q2"}}
+{"timestamp": "2025-11-06T20:01:50", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa"], "command": "q2"}}
+{"timestamp": "2025-11-06T20:03:37", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa"], "command": "q2"}}
+{"timestamp": "2025-11-06T20:05:20", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa"], "command": "q2"}}
+{"timestamp": "2025-11-06T20:05:41", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa", "clear-thought-mcp"], "command": "q2"}}
+{"timestamp": "2025-11-06T20:06:17", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["ref", "exa", "clear-thought-mcp"], "command": "q2"}}
+{"timestamp": "2025-11-06T20:08:49", "event": "launch_llm", "details": {"llm": "claude_code_mcp.json", "servers": ["exa", "clear-thought-mcp", "ref", "supabase"], "command": "claude"}}
+{"timestamp": "2025-11-06T20:10:11", "event": "launch_llm", "details": {"llm": "claude_code_mcp.json", "servers": ["exa", "clear-thought-mcp", "ref", "supabase"], "command": "claude"}}
+{"timestamp": "2025-11-06T20:11:27", "event": "launch_llm", "details": {"llm": "cline_mcp_settings.json", "servers": ["exa", "clear-thought-mcp", "ref", "supabase"], "command": "cline"}}
+{"timestamp": "2025-11-06T20:11:37", "event": "launch_llm", "details": {"llm": "gemini_cli_mcp.json", "servers": ["exa", "clear-thought-mcp", "ref", "supabase"], "command": "gemini"}}
+{"timestamp": "2025-11-06T20:14:11", "event": "launch_llm", "details": {"llm": "gemini_cli_mcp.json", "servers": ["exa", "clear-thought-mcp", "ref", "supabase"], "command": "C:\\Users\\matt\\AppData\\Roaming\\npm\\gemini.cmd"}}
+{"timestamp": "2025-11-06T20:31:01", "event": "launch_llm", "details": {"llm": "gemini_cli_mcp.json", "servers": ["zen", "exa"], "command": "cmd /c start gemini"}}
+{"timestamp": "2025-11-06T21:15:30", "event": "launch_llm", "details": {"llm": "gemini_cli_mcp.json", "servers": ["zen", "exa"], "command": "cmd /c start gemini"}}
+{"timestamp": "2025-11-08T20:16:16", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["exa"], "command": "q2"}}
+{"timestamp": "2025-11-08T20:25:29", "event": "launch_llm", "details": {"template": "amazonq_mcp.json", "command": "q"}}
+{"timestamp": "2025-11-08T20:26:18", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["exa"], "command": "q2"}}
+{"timestamp": "2025-11-08T20:27:30", "event": "launch_llm", "details": {"llm": "amazonq_mcp.json", "servers": ["exa"], "command": "q2"}}
+{"timestamp": "2025-11-08T20:49:55", "event": "launch_llm", "details": {"llm": "claude_code_mcp.json", "servers": ["exa"], "command": "claude"}}
+{"timestamp": "2025-11-10T22:18:16", "event": "launch_llm", "details": {"template": "amazonq_mcp.json", "command": "q"}}
+{"timestamp": "2025-11-11T04:19:33", "event": "install_all_to_project", "details": {"servers": ["gemini-cli-server", "zen", "sequential-thinking", "playwright"], "count": 9}}
+{"timestamp": "2025-11-11T04:22:49", "event": "install_all_to_project", "details": {"servers": ["desktop-commander", "context7", "sequential-thinking", "playwright", "ref", "zen", "gemini-cli-server"], "count": 9}}
+{"timestamp": "2025-11-11T04:40:29", "event": "install_all_to_project", "details": {"servers": ["gemini-cli-server", "playwright", "desktop-commander", "sequential-thinking", "zen", "context7", "ref"], "count": 10}}
+{"timestamp": "2025-11-11T06:12:38", "event": "install_all_to_project", "details": {"servers": ["desktop-commander", "sequential-thinking", "context7", "zen"], "count": 10}}
+{"timestamp": "2025-11-11T06:27:22", "event": "install_all_to_project", "details": {"servers": ["sequential-thinking", "zen", "desktop-commander", "context7"], "count": 10}}

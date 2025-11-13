@@ -1,0 +1,336 @@
+{
+  "mcp_servers": [
+    {
+      "name": "YouTube MCP Server",
+      "description": "Server for fetching YouTube video transcripts with multi-language support",
+      "official_package": "@kimtaeyoon83/mcp-server-youtube-transcript",
+      "github_url": "https://github.com/kimtaeyoon83/mcp-server-youtube-transcript",
+      "configuration": {
+        "command": "npx",
+        "args": ["-y", "@kimtaeyoon83/mcp-server-youtube-transcript"],
+        "env": {}
+      },
+      "installation": {
+        "method": "npx",
+        "smithery": "npx -y @smithery/cli install @kimtaeyoon83/mcp-server-youtube-transcript --client claude",
+        "mcp_get": "npx @michaellatman/mcp-get@latest install @kimtaeyoon83/mcp-server-youtube-transcript"
+      },
+      "requirements": {
+        "api_key": false,
+        "environment_variables": []
+      },
+      "alternatives": [
+        {
+          "name": "ZubeidHendricks YouTube MCP",
+          "package": "zubeid-youtube-mcp-server",
+          "requires_api_key": true
+        },
+        {
+          "name": "nattyraz YouTube MCP",
+          "github": "https://github.com/nattyraz/youtube-mcp",
+          "requires_api_key": true
+        }
+      ]
+    },
+    {
+      "name": "Twitter/X MCP Server",
+      "description": "Server for interacting with Twitter/X API - fetch tweets, post tweets, search, manage followers",
+      "official_package": "x-twitter-mcp-server",
+      "github_url": "https://github.com/rafaljanicki/x-twitter-mcp-server",
+      "configuration": {
+        "command": "x-twitter-mcp-server",
+        "args": [],
+        "env": {
+          "PYTHONUNBUFFERED": "1",
+          "TWITTER_API_KEY": "your_api_key",
+          "TWITTER_API_SECRET": "your_api_secret",
+          "TWITTER_ACCESS_TOKEN": "your_access_token",
+          "TWITTER_ACCESS_TOKEN_SECRET": "your_access_token_secret",
+          "TWITTER_BEARER_TOKEN": "your_bearer_token"
+        }
+      },
+      "alternative_configuration": {
+        "description": "Source installation with uv",
+        "command": "uv",
+        "args": ["--directory", "/path/to/x-twitter-mcp-server", "run", "x-twitter-mcp-server"],
+        "env": {
+          "PYTHONUNBUFFERED": "1"
+        }
+      },
+      "installation": {
+        "method": "pypi",
+        "command": "pip install x-twitter-mcp-server"
+      },
+      "requirements": {
+        "api_key": true,
+        "environment_variables": [
+          "TWITTER_API_KEY",
+          "TWITTER_API_SECRET",
+          "TWITTER_ACCESS_TOKEN",
+          "TWITTER_ACCESS_TOKEN_SECRET",
+          "TWITTER_BEARER_TOKEN"
+        ],
+        "api_source": "Twitter Developer Account",
+        "api_docs": "https://developer.twitter.com/"
+      },
+      "alternatives": [
+        {
+          "name": "EnesCinr Twitter MCP",
+          "github": "https://github.com/EnesCinr/twitter-mcp",
+          "type": "nodejs"
+        },
+        {
+          "name": "vidhupv X MCP",
+          "github": "https://github.com/vidhupv/x-mcp",
+          "type": "uv"
+        }
+      ]
+    },
+    {
+      "name": "Reddit MCP Server",
+      "description": "Server for browsing Reddit posts, searching content, and analyzing users",
+      "official_package": "reddit-mcp-buddy",
+      "github_url": "https://github.com/karanb192/reddit-mcp-buddy",
+      "configuration": {
+        "command": "npx",
+        "args": ["-y", "reddit-mcp-buddy"],
+        "env": {}
+      },
+      "configuration_with_auth": {
+        "command": "npx",
+        "args": ["-y", "reddit-mcp-buddy"],
+        "env": {
+          "REDDIT_CLIENT_ID": "your_client_id",
+          "REDDIT_CLIENT_SECRET": "your_client_secret",
+          "REDDIT_USERNAME": "your_username",
+          "REDDIT_PASSWORD": "your_password"
+        }
+      },
+      "installation": {
+        "method": "npm",
+        "global": "npm install -g reddit-mcp-buddy",
+        "npx": "npx -y reddit-mcp-buddy",
+        "claude_code": "claude mcp add --transport stdio reddit-mcp-buddy -s user -- npx -y reddit-mcp-buddy"
+      },
+      "requirements": {
+        "api_key": false,
+        "environment_variables": [],
+        "optional_auth": {
+          "enabled": true,
+          "benefits": "Higher rate limits (60-100 requests/minute)",
+          "variables": [
+            "REDDIT_CLIENT_ID",
+            "REDDIT_CLIENT_SECRET",
+            "REDDIT_USERNAME",
+            "REDDIT_PASSWORD"
+          ]
+        }
+      },
+      "alternatives": [
+        {
+          "name": "mcp-server-reddit (Hawstein)",
+          "github": "https://github.com/Hawstein/mcp-server-reddit"
+        },
+        {
+          "name": "reddit-mcp-server (jordanburke)",
+          "github": "https://github.com/jordanburke/reddit-mcp-server"
+        },
+        {
+          "name": "mcp-reddit (adhikasp)",
+          "github": "https://github.com/adhikasp/mcp-reddit"
+        }
+      ]
+    },
+    {
+      "name": "Sequential Thinking MCP Server",
+      "description": "Official Anthropic server for dynamic and reflective problem-solving through structured thinking process",
+      "official_package": "@modelcontextprotocol/server-sequential-thinking",
+      "github_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
+      "configuration": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+        "env": {}
+      },
+      "docker_configuration": {
+        "command": "docker",
+        "args": ["run", "--rm", "-i", "mcp/sequentialthinking"],
+        "env": {}
+      },
+      "installation": {
+        "method": "npx",
+        "docker": "docker pull mcp/sequentialthinking"
+      },
+      "requirements": {
+        "api_key": false,
+        "environment_variables": [],
+        "optional_env": {
+          "DISABLE_THOUGHT_LOGGING": "Set to 'true' to suppress logging"
+        }
+      },
+      "features": {
+        "core_tool": "sequential_thinking",
+        "capabilities": [
+          "Step-by-step analysis",
+          "Thought count tracking",
+          "Revision capabilities",
+          "Branching alternative reasoning paths"
+        ]
+      },
+      "alternatives": [
+        {
+          "name": "arben-adm MCP Sequential Thinking",
+          "github": "https://github.com/arben-adm/mcp-sequential-thinking"
+        },
+        {
+          "name": "Python Sequential Thinking MCP",
+          "github": "https://github.com/XD3an/python-sequential-thinking-mcp"
+        }
+      ]
+    },
+    {
+      "name": "Context7 MCP Server",
+      "description": "Up-to-date code documentation for LLMs and AI code editors by Upstash",
+      "official_package": "@upstash/context7-mcp",
+      "github_url": "https://github.com/upstash/context7",
+      "configuration_local": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_API_KEY"],
+        "env": {}
+      },
+      "configuration_remote": {
+        "url": "https://mcp.context7.com/mcp",
+        "headers": {
+          "CONTEXT7_API_KEY": "YOUR_API_KEY"
+        }
+      },
+      "installation": {
+        "method": "npx",
+        "claude_code_local": "claude mcp add context7 -- npx -y @upstash/context7-mcp --api-key YOUR_API_KEY",
+        "claude_code_remote": "claude mcp add --transport http context7 https://mcp.context7.com/mcp --header \"CONTEXT7_API_KEY: YOUR_API_KEY\"",
+        "smithery": "npx -y @smithery/cli@latest install @upstash/context7-mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>"
+      },
+      "requirements": {
+        "api_key": "optional",
+        "api_key_benefits": "Higher rate limits and private repository access",
+        "environment_variables": ["CONTEXT7_API_KEY"],
+        "nodejs_version": "18.0.0 or higher",
+        "api_source": "https://context7.com/dashboard"
+      },
+      "modes": {
+        "local": "Run npx command locally",
+        "remote": "Connect to hosted service at https://mcp.context7.com/mcp"
+      }
+    },
+    {
+      "name": "Zen MCP Server",
+      "description": "Supercharge Claude Code/GeminiCLI/CodexCLI with multiple AI models (Gemini/OpenAI/OpenRouter/Azure/Grok/Ollama) working as one",
+      "official_package": "zen-mcp-server",
+      "github_url": "https://github.com/BeehiveInnovations/zen-mcp-server",
+      "configuration": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "for p in $(which uvx 2>/dev/null) $HOME/.local/bin/uvx /opt/homebrew/bin/uvx /usr/local/bin/uvx uvx; do [ -x \"$p\" ] && exec \"$p\" --from git+https://github.com/BeehiveInnovations/zen-mcp-server.git zen-mcp-server; done; echo 'uvx not found' >&2; exit 1"
+        ],
+        "env": {
+          "PATH": "/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:~/.local/bin",
+          "GEMINI_API_KEY": "your-key-here",
+          "OPENAI_API_KEY": "optional",
+          "OPENROUTER_API_KEY": "optional",
+          "AZURE_OPENAI_API_KEY": "optional",
+          "DISABLED_TOOLS": "analyze,refactor,testgen,secaudit,docgen,tracer",
+          "DEFAULT_MODEL": "auto"
+        }
+      },
+      "installation": {
+        "method": "git + uvx",
+        "quick_setup": "./run-server.sh",
+        "one_line": "exec $(which uvx || echo uvx) --from git+https://github.com/BeehiveInnovations/zen-mcp-server.git zen-mcp-server"
+      },
+      "requirements": {
+        "api_key": true,
+        "api_key_note": "At least one API key required from supported providers",
+        "environment_variables": [
+          "GEMINI_API_KEY",
+          "OPENAI_API_KEY",
+          "OPENROUTER_API_KEY",
+          "AZURE_OPENAI_API_KEY"
+        ],
+        "python_version": "3.10+ (3.12 recommended)",
+        "tools_required": ["Git", "uv"],
+        "windows_note": "Requires WSL2 for Claude Code CLI"
+      },
+      "supported_providers": [
+        "OpenRouter (multiple models)",
+        "Gemini (Google AI Studio)",
+        "OpenAI (O3, GPT-5)",
+        "X.AI (Grok models)",
+        "DIAL Platform"
+      ],
+      "configuration_options": {
+        "DISABLED_TOOLS": "Comma-separated list of tools to disable",
+        "DEFAULT_MODEL": "Options: 'auto', 'pro', or specific model names",
+        "LOG_LEVEL": "Logging verbosity",
+        "CONVERSATION_TIMEOUT_HOURS": "Session timeout",
+        "MAX_CONVERSATION_TURNS": "Maximum turns per conversation"
+      }
+    },
+    {
+      "name": "Asana MCP Server",
+      "description": "Server for managing Asana tasks and projects - create, update, list, and delete tasks",
+      "official_package": "@roychri/mcp-server-asana",
+      "github_url": "https://github.com/roychri/mcp-server-asana",
+      "configuration": {
+        "command": "npx",
+        "args": ["-y", "@roychri/mcp-server-asana"],
+        "env": {
+          "ASANA_ACCESS_TOKEN": "your-asana-access-token",
+          "READ_ONLY_MODE": "optional - set to 'true' to disable write operations"
+        }
+      },
+      "installation": {
+        "method": "npm",
+        "npm_install": "npm i @roychri/mcp-server-asana",
+        "npx": "npx -y @roychri/mcp-server-asana",
+        "claude_code": "claude mcp add asana -e ASANA_ACCESS_TOKEN=<TOKEN> -- npx -y @roychri/mcp-server-asana",
+        "global": "npm install -g tiny-asana-mcp-server"
+      },
+      "requirements": {
+        "api_key": true,
+        "environment_variables": ["ASANA_ACCESS_TOKEN"],
+        "optional_variables": ["READ_ONLY_MODE"],
+        "api_source": "https://app.asana.com/0/my-apps",
+        "api_type": "Personal Access Token"
+      },
+      "alternatives": [
+        {
+          "name": "@cristip73/mcp-server-asana",
+          "package": "@cristip73/mcp-server-asana"
+        },
+        {
+          "name": "tiny-asana-mcp-server",
+          "package": "tiny-asana-mcp-server"
+        },
+        {
+          "name": "@microagents/server-asana",
+          "package": "@microagents/server-asana"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "generated_date": "2025-11-11",
+    "total_servers": 7,
+    "notes": [
+      "All configurations shown are for Claude Desktop/Code unless otherwise specified",
+      "Environment variables should be replaced with actual API keys before use",
+      "Most servers support multiple installation methods (npx, npm, git)",
+      "API keys are typically required for production use, though some servers work without authentication at reduced rate limits"
+    ],
+    "configuration_file_locations": {
+      "claude_desktop_windows": "%APPDATA%\\Claude\\claude_desktop_config.json",
+      "claude_desktop_macos": "~/Library/Application Support/Claude/claude_desktop_config.json",
+      "cursor_config": "~/.cursor/mcp.json"
+    }
+  }
+}

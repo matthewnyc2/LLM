@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "zen": {
+      "command": "/home/matt/zen-mcp-server/zen-mcp-server"
+    },
+    "exa": {
+      "type": "http",
+      "url": "https://server.smithery.ai/exa/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+    }
+  }
+}

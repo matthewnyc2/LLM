@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "exa": {
+      "type": "http",
+      "url": "https://server.smithery.ai/exa/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+    },
+    "clear-thought-mcp": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@ThinkFar/clear-thought-mcp",
+        "--key",
+        "4ecd3a47-5c4d-4433-bab5-f370c4020961"
+      ]
+    },
+    "ref": {
+      "type": "http",
+      "url": "https://server.smithery.ai/@ref-tools/ref-tools-mcp/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://server.smithery.ai/supabase/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+    }
+  }
+}
