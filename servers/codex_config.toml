@@ -26,10 +26,9 @@ type = "http"
 url = "https://server.smithery.ai/notion/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
 
 [mcp_servers.clear-thought-mcp]
-command = "cmd"
+type = "stdio"
+command = "npx"
 args = [
-  "/c",
-  "npx",
   "-y",
   "@smithery/cli@latest",
   "run",
@@ -39,10 +38,9 @@ args = [
 ]
 
 [mcp_servers.gmail-mcp]
-command = "cmd"
+type = "stdio"
+command = "npx"
 args = [
-  "/c",
-  "npx",
   "-y",
   "@smithery/cli@latest",
   "run",
@@ -54,10 +52,9 @@ args = [
 ]
 
 [mcp_servers.playwright-mcp]
-command = "cmd"
+type = "stdio"
+command = "npx"
 args = [
-  "/c",
-  "npx",
   "-y",
   "@smithery/cli@latest",
   "run",
@@ -66,11 +63,15 @@ args = [
   "4ecd3a47-5c4d-4433-bab5-f370c4020961"
 ]
 [mcp_servers.context7]
-httpUrl = "https://mcp.context7.com/mcp"
+type = "http"
+url = "https://mcp.context7.com/mcp"
 
 [mcp_servers.serena]
+type = "http"
 url = "http://192.168.1.41:8765/sse"
 timeout = 10000
 
 [mcp_servers.zen]
-command = "/home/matt/zen-mcp-server/zen-mcp-server"
+type = "stdio"
+command = "uvx"
+args = ["zen-mcp-server"]

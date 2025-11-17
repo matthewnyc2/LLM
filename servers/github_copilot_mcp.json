@@ -74,9 +74,10 @@
     },
     "context7": {
       "type": "http",
-      "httpUrl": "https://mcp.context7.com/mcp"
+      "url": "https://mcp.context7.com/mcp"
     },
     "serena": {
+      "type": "http",
       "url": "http://192.168.1.41:8765/sse",
       "timeout": 10000
     },

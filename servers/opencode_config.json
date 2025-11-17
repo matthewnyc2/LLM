@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "mcp": {
+  "mcpServers": {
     "supabase": {
       "type": "http",
       "url": "https://server.smithery.ai/supabase/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
@@ -75,9 +75,10 @@
     },
     "context7": {
       "type": "http",
-      "httpUrl": "https://mcp.context7.com/mcp"
+      "url": "https://mcp.context7.com/mcp"
     },
     "serena": {
+      "type": "http",
       "url": "http://192.168.1.41:8765/sse",
       "timeout": 10000
     },
