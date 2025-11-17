@@ -110,14 +110,29 @@ Templates in `servers/` directory come in two formats:
 
 4. **Configuration persistence**: User selections persist across sessions in `config.json`, so repeated launches remember previous choices.
 
-## WSL Support for Cline
+## WSL Support for Cline and Codex
 
-When running llm.py on Windows and launching Cline, the application automatically uses WSL (Windows Subsystem for Linux) to launch Cline. This ensures cross-platform compatibility even when the main application is run from Windows.
+When running llm.py on Windows and launching Cline or Codex, the application automatically uses WSL (Windows Subsystem for Linux) to launch these applications. This ensures cross-platform compatibility even when the main application is run from Windows.
 
 The implementation automatically detects:
 - If running on Windows (`sys.platform == "win32"`)
-- If the selected LLM is Cline
-- Then launches via: `wsl -e bash -c cline`
+- If the selected LLM is Cline or Codex
+- Then launches via: `wsl -e bash -c <command>`
+
+## Colorful Centered UI
+
+The application features a modern, colorful command-line interface with:
+- **Centered text display**: All menus and prompts are centered based on terminal width
+- **Color-coded options**: Different colors for different menu items and status messages
+  - Green: Selected/active items and success messages
+  - Blue: Menu options and informational text
+  - Red: Cancel/exit options and error messages
+  - Yellow: Headers and important notices
+  - Cyan: Separators and secondary information
+- **Screen clearing**: Each menu clears the screen for a clean, focused view
+- **Visual indicators**: Checkmarks (✓) for selected items, colored status messages
+
+The colorful UI uses the `colorama` library for cross-platform color support. If colorama is not installed, the application gracefully falls back to plain text display.
 
 ## File Organization
 

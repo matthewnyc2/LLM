@@ -12,11 +12,65 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set
 
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    class Fore:
+        RED = GREEN = YELLOW = BLUE = MAGENTA = CYAN = WHITE = RESET = LIGHTBLUE_EX = LIGHTGREEN_EX = LIGHTMAGENTA_EX = ""
+    class Back:
+        BLACK = RED = GREEN = YELLOW = BLUE = MAGENTA = CYAN = WHITE = RESET = ""
+    class Style:
+        DIM = NORMAL = BRIGHT = RESET_ALL = ""
+    COLORS_AVAILABLE = False
+
 CONFIG_DIR = Path(__file__).resolve().parent
 SERVERS_DIR = CONFIG_DIR / "servers"
 OUTPUT_DIR = CONFIG_DIR / "generated"
 CONFIG_PATH = CONFIG_DIR / "config.json"
 HISTORY_PATH = CONFIG_DIR / "history.log"
+
+
+def clear_screen() -> None:
+    """Clear the terminal screen."""
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def get_terminal_width() -> int:
+    """Get the current terminal width."""
+    try:
+        return os.get_terminal_size().columns
+    except:
+        return 80
+
+
+def center_text(text: str, width: Optional[int] = None) -> str:
+    """Center text within the terminal width."""
+    if width is None:
+        width = get_terminal_width()
+    padding = (width - len(text)) // 2
+    return " " * padding + text
+
+
+def print_centered(text: str, color: str = "") -> None:
+    """Print centered text with optional color."""
+    width = get_terminal_width()
+    centered = center_text(text, width)
+    if color:
+        print(f"{color}{centered}{Style.RESET_ALL}")
+    else:
+        print(centered)
+
+
+def print_header(title: str) -> None:
+    """Print a colorful centered header."""
+    width = get_terminal_width()
+    print()
+    print_centered("=" * min(60, width - 10), Fore.CYAN)
+    print_centered(title, Fore.YELLOW + Style.BRIGHT)
+    print_centered("=" * min(60, width - 10), Fore.CYAN)
+    print()
 
 DEFAULT_CONFIG = {
     "output_directory": "generated",
@@ -180,7 +234,10 @@ def log_history(event: str, details: Optional[Dict[str, object]] = None) -> None
 
 
 def display_history() -> None:
-    print("\n--- History Log ---")
+    clear_screen()
+    print_header("History Log")
+    width = get_terminal_width()
+
     try:
         with HISTORY_PATH.open("r", encoding="utf-8") as handle:
             for raw_line in handle:
@@ -190,15 +247,18 @@ def display_history() -> None:
                 try:
                     entry = json.loads(line)
                 except json.JSONDecodeError:
-                    print(line)
+                    print_centered(line, Fore.WHITE)
                     continue
                 timestamp = entry.get("timestamp", "?")
                 event = entry.get("event", "?")
                 details = entry.get("details", {})
-                print(f"[{timestamp}] {event}: {details}")
+                log_line = f"[{timestamp}] {event}: {details}"
+                print_centered(log_line, Fore.CYAN)
     except OSError as exc:
-        print(f"Unable to read history: {exc}")
-    print("-------------------\n")
+        print_centered(f"Unable to read history: {exc}", Fore.RED)
+
+    print()
+    input(center_text("Press Enter to continue...", width))
 
 
 def friendly_name(filename: str) -> str:
@@ -314,43 +374,64 @@ def get_all_mcp_servers(templates: List[ServerTemplate]) -> List[str]:
 
 def select_llm(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
     """Screen to select LLM with numbered list."""
-    print("\n=== Select LLM ===")
+    clear_screen()
+    print_header("Select LLM")
+
     options = [template.display_name for template in templates]
-    
+    width = get_terminal_width()
+
     for idx, name in enumerate(options, start=1):
-        print(f"  {idx}. {name}")
-    print("  X. Cancel")
-    
-    choice = input("Select LLM: ").strip().lower()
+        line = f"{idx}. {name}"
+        print_centered(line, Fore.LIGHTGREEN_EX if idx % 2 == 0 else Fore.LIGHTBLUE_EX)
+
+    print()
+    print_centered("X. Cancel", Fore.RED)
+    print()
+
+    choice = input(center_text("Select LLM: ", width)).strip().lower()
     if choice == "x":
         return
-    
+
     if choice.isdigit():
         index = int(choice)
         if 1 <= index <= len(options):
             selected_template = templates[index - 1]
             config["selected_llm"] = selected_template.filename
             save_config(config)
-            print(f"Selected: {selected_template.display_name}\n")
+            print_centered(f"✓ Selected: {selected_template.display_name}", Fore.GREEN + Style.BRIGHT)
+            input(center_text("Press Enter to continue...", width))
             return
-    
-    print("Invalid selection.\n")
+
+    print_centered("Invalid selection.", Fore.RED)
+    input(center_text("Press Enter to continue...", width))
 
 
 def select_mcp_servers(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
     """Screen to select MCP servers from all available servers."""
     all_servers = get_all_mcp_servers(templates)
     selected_servers = set(config.get("selected_mcp_servers", []))
-    
+    width = get_terminal_width()
+
     while True:
-        print("\n=== Select MCP Servers ===")
+        clear_screen()
+        print_header("Select MCP Servers")
+
+        print_centered(f"Selected: {len(selected_servers)} / {len(all_servers)} servers",
+                      Fore.CYAN + Style.BRIGHT)
+        print()
+
         for idx, server in enumerate(all_servers, start=1):
-            mark = "[x]" if server in selected_servers else "[ ]"
-            print(f"  {idx:>2}. {mark} {server}")
-        print("  A. Toggle all")
-        print("  X. Return to main menu")
-        
-        choice = input("Select server to toggle: ").strip().lower()
+            mark = "✓" if server in selected_servers else " "
+            color = Fore.GREEN if server in selected_servers else Fore.WHITE
+            line = f"{idx:>2}. [{mark}] {server}"
+            print_centered(line, color)
+
+        print()
+        print_centered("A. Toggle all", Fore.YELLOW)
+        print_centered("X. Return to main menu", Fore.RED)
+        print()
+
+        choice = input(center_text("Select server to toggle: ", width)).strip().lower()
         if choice == "x":
             break
         if choice == "a":
@@ -368,8 +449,9 @@ def select_mcp_servers(templates: List[ServerTemplate], config: Dict[str, object
                 else:
                     selected_servers.add(server)
                 continue
-        print("Invalid selection.")
-    
+        print_centered("Invalid selection.", Fore.RED)
+        input(center_text("Press Enter to continue...", width))
+
     config["selected_mcp_servers"] = list(selected_servers)
     save_config(config)
 
@@ -460,8 +542,8 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         print(f"Launching {template.display_name}...\n")
         log_history("launch_llm", {"template": template.filename, "command": cmd})
         try:
-            # Special handling for Cline on Windows - use WSL
-            if sys.platform == "win32" and cli_key == "cline":
+            # Special handling for Cline and Codex on Windows - use WSL
+            if sys.platform == "win32" and cli_key in ["cline", "codex"]:
                 subprocess.Popen(["wsl", "-e", "bash", "-c", cmd])
             elif sys.platform == "win32":
                 subprocess.Popen(f"start {cmd}", shell=True)
@@ -546,46 +628,57 @@ def batch_commands(templates: List[ServerTemplate], config: Dict[str, object]) -
 
 def show_main_menu(config: Dict[str, object]) -> None:
     """Show simplified main menu."""
-    print("\n=== MCP Configuration Builder ===")
-    
+    clear_screen()
+    width = get_terminal_width()
+
+    print_header("MCP Configuration Builder")
+
     # Show selected LLM
     selected_llm = config.get("selected_llm")
     if selected_llm:
         llm_name = friendly_name(selected_llm)
-        print(f"Selected LLM: {llm_name}")
+        print_centered(f"Current LLM: {llm_name}", Fore.GREEN + Style.BRIGHT)
     else:
-        print("Selected LLM: None")
-    
+        print_centered("Current LLM: None", Fore.RED)
+
     # Show selected MCP servers
     selected_servers = config.get("selected_mcp_servers", [])
     if selected_servers:
-        print(f"MCP Servers: {', '.join(selected_servers)}")
+        server_count = len(selected_servers)
+        print_centered(f"MCP Servers: {server_count} selected", Fore.CYAN)
     else:
-        print("MCP Servers: None")
-    
-    print("===============================\n")
-    
-    print("Options:")
-    print("  1. Select LLM")
-    print("  2. Select MCP Servers") 
-    print("  3. Launch LLM")
-    print("  4. Batch Commands")
-    print("  5. History")
-    print("  6. Exit")
+        print_centered("MCP Servers: None", Fore.RED)
+
+    print()
+    print_centered("─" * min(50, width - 20), Fore.CYAN)
+    print()
+
+    print_centered("Options:", Fore.YELLOW + Style.BRIGHT)
+    print()
+    print_centered("1. Select LLM", Fore.LIGHTBLUE_EX)
+    print_centered("2. Select MCP Servers", Fore.LIGHTBLUE_EX)
+    print_centered("3. Launch LLM", Fore.LIGHTGREEN_EX)
+    print_centered("4. Batch Commands", Fore.LIGHTMAGENTA_EX)
+    print_centered("5. History", Fore.CYAN)
+    print_centered("6. Exit", Fore.RED)
+    print()
 
 
 def main() -> None:
     ensure_environment()
     templates = load_templates()
     if not templates:
-        print("No templates found in", SERVERS_DIR)
+        clear_screen()
+        print_header("Error")
+        print_centered(f"No templates found in {SERVERS_DIR}", Fore.RED)
         return
 
     config = load_config()
+    width = get_terminal_width()
 
     while True:
         show_main_menu(config)
-        choice = input("Choose an option: ").strip()
+        choice = input(center_text("Choose an option: ", width)).strip()
 
         if choice == "1":
             select_llm(templates, config)
@@ -598,10 +691,14 @@ def main() -> None:
         elif choice == "5":
             display_history()
         elif choice == "6":
-            print("Goodbye!")
+            clear_screen()
+            print_header("Goodbye!")
+            print_centered("Thank you for using MCP Configuration Builder!", Fore.CYAN + Style.BRIGHT)
+            print()
             break
         else:
-            print("Invalid option.\n")
+            print_centered("Invalid option.", Fore.RED)
+            input(center_text("Press Enter to continue...", width))
 
 
 if __name__ == "__main__":
