@@ -2,83 +2,66 @@
 # Location: ~/.codex/config.toml
 
 [mcp_servers.supabase]
-type = "http"
-url = "https://server.smithery.ai/supabase/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+url = "https://server.smithery.ai/supabase/mcp"
+bearer_token_env_var = "SMITHERY_API_KEY"
+http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
 
 [mcp_servers.ref]
-type = "http"
-url = "https://server.smithery.ai/@ref-tools/ref-tools-mcp/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+command = "npx"
+args = ["-y", "ref-tools-mcp"]
 
 [mcp_servers.exa]
-type = "http"
-url = "https://server.smithery.ai/exa/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+url = "https://server.smithery.ai/exa/mcp"
+bearer_token_env_var = "SMITHERY_API_KEY"
+http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
 
 [mcp_servers.sequential-thinking]
-type = "http"
-url = "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+url = "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
 
 [mcp_servers.browserbase]
-type = "http"
-url = "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+url = "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp"
+bearer_token_env_var = "SMITHERY_API_KEY"
+http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
 
 [mcp_servers.notion]
-type = "http"
-url = "https://server.smithery.ai/notion/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+url = "https://server.smithery.ai/notion/mcp"
+bearer_token_env_var = "SMITHERY_API_KEY"
+http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
 
 [mcp_servers.clear-thought-mcp]
-type = "stdio"
-command = "cmd"
-args = [
-  "/c",
-  "npx",
-  "-y",
-  "@smithery/cli@latest",
-  "run",
-  "@ThinkFar/clear-thought-mcp",
-  "--key",
-  "4ecd3a47-5c4d-4433-bab5-f370c4020961"
-]
+command = "npx"
+args = ["-y", "@smithery/cli@latest", "run", "@ThinkFar/clear-thought-mcp", "--key"]
+env = { "SMITHERY_API_KEY" = "$SMITHERY_API_KEY" }
 
 [mcp_servers.gmail-mcp]
-type = "stdio"
-command = "cmd"
-args = [
-  "/c",
-  "npx",
-  "-y",
-  "@smithery/cli@latest",
-  "run",
-  "@shinzo-labs/gmail-mcp",
-  "--key",
-  "4ecd3a47-5c4d-4433-bab5-f370c4020961",
-  "--profile",
-  "bored-trout-UyIpuG"
-]
+command = "npx"
+args = ["-y", "@smithery/cli@latest", "run", "@shinzo-labs/gmail-mcp", "--key", "--profile"]
+env = { "SMITHERY_API_KEY" = "$SMITHERY_API_KEY", "SMITHERY_PROFILE" = "$SMITHERY_PROFILE" }
 
 [mcp_servers.playwright-mcp]
-type = "stdio"
-command = "cmd"
-args = [
-  "/c",
-  "npx",
-  "-y",
-  "@smithery/cli@latest",
-  "run",
-  "@microsoft/playwright-mcp",
-  "--key",
-  "4ecd3a47-5c4d-4433-bab5-f370c4020961"
-]
+command = "npx"
+args = ["-y", "@smithery/cli@latest", "run", "@microsoft/playwright-mcp", "--key"]
+env = { "SMITHERY_API_KEY" = "$SMITHERY_API_KEY" }
 
 [mcp_servers.context7]
-type = "http"
 url = "https://mcp.context7.com/mcp"
 
 [mcp_servers.serena]
-type = "http"
-url = "http://192.168.1.41:8765/sse"
-timeout = 10000
+url = "$SERENA_URL"
+startup_timeout_sec = 10.0
 
 [mcp_servers.zen]
-type = "stdio"
 command = "uvx"
 args = ["zen-mcp"]
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@microsoft/playwright-mcp"]
+
+[mcp_servers.desktop-commander]
+command = "npx"
+args = ["-y", "@wonderwhy-er/desktop-commander"]
+
+[mcp_servers.gemini-cli-server]
+command = "gemini"
+args = ["mcp", "server"]
