@@ -33,7 +33,7 @@ TEMPLATE_NAME_OVERRIDES = {
     "cline_mcp_settings.json": "Cline",
     "gemini_cli_mcp.json": "Gemini CLI",
     "github_copilot_mcp.json": "GitHub Copilot",
-    "kilo_code_mcp.json": "Kilo (Cursor fork)",
+    "kilo_code_mcp.json": "Kilo Code",
     "opencode_config.json": "Opencode",
     "codex_config.toml": "Codex",
 }
