@@ -35,7 +35,6 @@ TEMPLATE_NAME_OVERRIDES = {
     "github_copilot_mcp.json": "GitHub Copilot",
     "kilo_code_mcp.json": "Kilo (Cursor fork)",
     "opencode_config.json": "Opencode",
-    "roo_code_mcp.json": "Roo Code",
     "codex_config.toml": "Codex",
 }
 
@@ -48,7 +47,6 @@ CLI_LAUNCH_COMMANDS = {
     "github_copilot": "copilot",
     "kilo_code": "kilocode",
     "opencode": "opencode",
-    "roo_code": "roo-code",
     "codex": "codex",
 }
 
@@ -62,7 +60,6 @@ APP_LOCATIONS = {
         "github_copilot_mcp.json": r"%APPDATA%\Code\User\settings.json",
         "kilo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\settings\mcp_settings.json",
         "opencode_config.json": r"%USERPROFILE%\.config\opencode\opencode.json",
-        "roo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\rooveterinaryinc.roo-cline\settings\cline_mcp_settings.json",
         "codex_config.toml": r"%USERPROFILE%\.codex\config.toml",
     },
     "unix": {
@@ -74,7 +71,6 @@ APP_LOCATIONS = {
         "github_copilot_mcp.json": "~/.config/Code/User/settings.json",
         "kilo_code_mcp.json": "~/.config/Code/User/globalStorage/kilocode.kilo-code/settings/mcp_settings.json",
         "opencode_config.json": "~/.config/opencode/opencode.json",
-        "roo_code_mcp.json": "~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/cline_mcp_settings.json",
         "codex_config.toml": "~/.codex/config.toml",
     },
     "project": {
@@ -86,7 +82,6 @@ APP_LOCATIONS = {
         "github_copilot_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.vscode\mcp.json",
         "kilo_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.kilocode\mcp.json",
         "opencode_config.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\opencode.json",
-        "roo_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.roo\mcp.json",
         "codex_config.toml": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.codex\config.toml",
     },
 }
@@ -455,7 +450,6 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         "github_copilot": "github_copilot",
         "kilo_code": "kilo_code",
         "opencode": "opencode",
-        "roo_code": "roo_code",
         "codex": "codex",
     }
     
@@ -466,7 +460,10 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         print(f"Launching {template.display_name}...\n")
         log_history("launch_llm", {"template": template.filename, "command": cmd})
         try:
-            if sys.platform == "win32":
+            # Special handling for Cline on Windows - use WSL
+            if sys.platform == "win32" and cli_key == "cline":
+                subprocess.Popen(["wsl", "-e", "bash", "-c", cmd])
+            elif sys.platform == "win32":
                 subprocess.Popen(f"start {cmd}", shell=True)
             else:
                 subprocess.Popen([cmd])
