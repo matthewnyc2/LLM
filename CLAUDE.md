@@ -138,7 +138,7 @@ The following LLM applications are supported:
 - **Cline**: Terminal-based LLM interface (with WSL support on Windows)
 - **Gemini CLI**: Google's Gemini command-line interface
 - **GitHub Copilot**: GitHub's AI coding assistant
-- **Kilo (Cursor fork)**: Cursor-based code editor
+- **Kilo Code**: VS Code AI agent (fork of Roo Code/Cline)
 - **Opencode**: Open-source code assistant
 - **Codex**: OpenAI's code generation model
 

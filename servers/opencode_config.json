@@ -2,115 +2,105 @@
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
     "supabase": {
-      "type": "http",
-      "url": "https://server.smithery.ai/supabase/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+      "type": "remote",
+      "url": "https://server.smithery.ai/supabase/mcp",
+      "enabled": true,
+      "environment": {
+        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "ref": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "ref-tools-mcp"
-      ]
+      "type": "local",
+      "command": ["npx", "-y", "ref-tools-mcp"],
+      "enabled": true
     },
     "exa": {
-      "type": "http",
-      "url": "https://server.smithery.ai/exa/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+      "type": "remote",
+      "url": "https://server.smithery.ai/exa/mcp",
+      "enabled": true,
+      "environment": {
+        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "sequential-thinking": {
-      "type": "http",
-      "url": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
+      "type": "remote",
+      "url": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp",
+      "enabled": true
     },
     "browserbase": {
-      "type": "http",
-      "url": "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+      "type": "remote",
+      "url": "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp",
+      "enabled": true,
+      "environment": {
+        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "notion": {
-      "type": "http",
-      "url": "https://server.smithery.ai/notion/mcp?profile=bored-trout-UyIpuG&api_key=4ecd3a47-5c4d-4433-bab5-f370c4020961"
+      "type": "remote",
+      "url": "https://server.smithery.ai/notion/mcp",
+      "enabled": true,
+      "environment": {
+        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "clear-thought-mcp": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@ThinkFar/clear-thought-mcp",
-        "--key",
-        "4ecd3a47-5c4d-4433-bab5-f370c4020961"
-      ]
+      "type": "local",
+      "command": ["npx", "-y", "@smithery/cli@latest", "run", "@ThinkFar/clear-thought-mcp", "--key"],
+      "enabled": true,
+      "environment": {
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "gmail-mcp": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@shinzo-labs/gmail-mcp",
-        "--key",
-        "4ecd3a47-5c4d-4433-bab5-f370c4020961",
-        "--profile",
-        "bored-trout-UyIpuG"
-      ]
+      "type": "local",
+      "command": ["npx", "-y", "@smithery/cli@latest", "run", "@shinzo-labs/gmail-mcp", "--key", "--profile"],
+      "enabled": true,
+      "environment": {
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}",
+        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}"
+      }
     },
     "playwright-mcp": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@microsoft/playwright-mcp",
-        "--key",
-        "4ecd3a47-5c4d-4433-bab5-f370c4020961"
-      ]
+      "type": "local",
+      "command": ["npx", "-y", "@smithery/cli@latest", "run", "@microsoft/playwright-mcp", "--key"],
+      "enabled": true,
+      "environment": {
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "context7": {
-      "type": "http",
-      "httpUrl": "https://mcp.context7.com/mcp"
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
     },
     "serena": {
-      "url": "http://192.168.1.41:8765/sse",
-      "timeout": 10000
+      "type": "remote",
+      "url": "${SERENA_URL:-http://localhost:8765/sse}",
+      "enabled": true
     },
     "zen": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "zen-mcp"
-      ]
+      "type": "local",
+      "command": ["uvx", "zen-mcp"],
+      "enabled": true
     },
     "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@microsoft/playwright-mcp"
-      ]
+      "type": "local",
+      "command": ["npx", "-y", "@microsoft/playwright-mcp"],
+      "enabled": true
     },
     "desktop-commander": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@wonderwhy-er/desktop-commander"
-      ]
+      "type": "local",
+      "command": ["npx", "-y", "@wonderwhy-er/desktop-commander"],
+      "enabled": true
     },
     "gemini-cli-server": {
-      "type": "stdio",
-      "command": "gemini",
-      "args": [
-        "mcp",
-        "server"
-      ]
+      "type": "local",
+      "command": ["gemini", "mcp", "server"],
+      "enabled": true
     }
   }
 }
