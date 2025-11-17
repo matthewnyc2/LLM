@@ -31,10 +31,8 @@
     },
     "clear-thought-mcp": {
       "type": "stdio",
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
         "@smithery/cli@latest",
         "run",
@@ -45,10 +43,8 @@
     },
     "gmail-mcp": {
       "type": "stdio",
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
         "@smithery/cli@latest",
         "run",
@@ -61,10 +57,8 @@
     },
     "playwright-mcp": {
       "type": "stdio",
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
         "@smithery/cli@latest",
         "run",
