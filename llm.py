@@ -19,9 +19,7 @@ CONFIG_PATH = CONFIG_DIR / "config.json"
 HISTORY_PATH = CONFIG_DIR / "history.log"
 
 DEFAULT_CONFIG = {
-    "last_template": None,
     "output_directory": "generated",
-    "selections": {},
     "location_type": "windows",
     "last_batch_server": None,
     "selected_llm": None,
@@ -42,26 +40,28 @@ TEMPLATE_NAME_OVERRIDES = {
 }
 
 CLI_LAUNCH_COMMANDS = {
-    "amazon_q": "q",
+    "amazon_q": "q2",
     "claude_code": "claude",
     "claude_desktop": "claude",
     "cline": "cline",
-    "gemini": "gemini",
+    "gemini": "cmd /c start gemini",
+    "github_copilot": "copilot",
     "kilo_code": "kilocode",
     "opencode": "opencode",
+    "roo_code": "roo-code",
     "codex": "codex",
 }
 
 APP_LOCATIONS = {
     "windows": {
-        "amazonq_mcp.json": r"C:\Users\matt\.aws\amazonq\mcp.json",
-        "claude_code_mcp.json": r"C:\Users\matt\.claude.json",
-        "claude_desktop_config.json": r"C:\Users\matt\AppData\Roaming\Claude\claude_desktop_config.json",
+        "amazonq_mcp.json": r"%USERPROFILE%\.aws\amazonq\mcp.json",
+        "claude_code_mcp.json": r"%USERPROFILE%\.claude.json",
+        "claude_desktop_config.json": r"%APPDATA%\Claude\claude_desktop_config.json",
         "cline_mcp_settings.json": r"%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json",
-        "gemini_cli_mcp.json": r"C:\Users\matt\.gemini\settings.json",
-        "github_copilot_mcp.json": r"C:\Users\matt\AppData\Roaming\Code\User\settings.json",
+        "gemini_cli_mcp.json": r"%USERPROFILE%\.gemini\settings.json",
+        "github_copilot_mcp.json": r"%APPDATA%\Code\User\settings.json",
         "kilo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\settings\mcp_settings.json",
-        "opencode_config.json": r"C:\Users\matt\.config\opencode\opencode.json",
+        "opencode_config.json": r"%USERPROFILE%\.config\opencode\opencode.json",
         "roo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\rooveterinaryinc.roo-cline\settings\cline_mcp_settings.json",
         "codex_config.toml": r"%USERPROFILE%\.codex\config.toml",
     },
@@ -158,9 +158,7 @@ def load_config() -> Dict[str, object]:
             config = json.load(handle)
     except (OSError, json.JSONDecodeError):
         config = copy.deepcopy(DEFAULT_CONFIG)
-    config.setdefault("last_template", DEFAULT_CONFIG["last_template"])
     config.setdefault("output_directory", DEFAULT_CONFIG["output_directory"])
-    config.setdefault("selections", {})
     config.setdefault("location_type", DEFAULT_CONFIG["location_type"])
     config.setdefault("last_batch_server", DEFAULT_CONFIG["last_batch_server"])
     config.setdefault("selected_llm", DEFAULT_CONFIG["selected_llm"])
@@ -437,7 +435,7 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
     locations = APP_LOCATIONS.get(location_type, {})
     if template.filename in locations:
         app_location_raw = locations[template.filename]
-        app_location = Path(os.path.expandvars(app_location_raw))
+        app_location = Path(os.path.expandvars(app_location_raw)).expanduser()
         app_location.parent.mkdir(parents=True, exist_ok=True)
         
         try:
@@ -450,12 +448,14 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
     cli_key = template.filename.replace(".json", "").replace(".toml", "").replace("_mcp", "").replace("_settings", "").replace("_config", "")
     cli_map = {
         "amazonq": "amazon_q",
-        "claude_code": "claude_code", 
+        "claude_code": "claude_code",
         "claude_desktop": "claude_desktop",
         "cline": "cline",
         "gemini_cli": "gemini",
+        "github_copilot": "github_copilot",
         "kilo_code": "kilo_code",
         "opencode": "opencode",
+        "roo_code": "roo_code",
         "codex": "codex",
     }
     
