@@ -1,67 +1,121 @@
-# Codex MCP Server Configuration
-# Location: ~/.codex/config.toml
-
-[mcp_servers.supabase]
+[windows.mcp_servers.supabase]
 url = "https://server.smithery.ai/supabase/mcp"
-bearer_token_env_var = "SMITHERY_API_KEY"
-http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
 
-[mcp_servers.ref]
-command = "npx"
+[windows.mcp_servers.ref]
+command = "npx.cmd"
 args = ["-y", "ref-tools-mcp"]
 
-[mcp_servers.exa]
+[windows.mcp_servers.exa]
 url = "https://server.smithery.ai/exa/mcp"
-bearer_token_env_var = "SMITHERY_API_KEY"
-http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
 
-[mcp_servers.sequential-thinking]
+[windows.mcp_servers.sequential-thinking]
 url = "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
 
-[mcp_servers.browserbase]
+[windows.mcp_servers.browserbase]
 url = "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp"
-bearer_token_env_var = "SMITHERY_API_KEY"
-http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
 
-[mcp_servers.notion]
+[windows.mcp_servers.notion]
 url = "https://server.smithery.ai/notion/mcp"
-bearer_token_env_var = "SMITHERY_API_KEY"
-http_headers = { "X-Smithery-Profile" = "$SMITHERY_PROFILE" }
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
 
-[mcp_servers.clear-thought-mcp]
-command = "npx"
-args = ["-y", "@smithery/cli@latest", "run", "@ThinkFar/clear-thought-mcp", "--key"]
-env = { "SMITHERY_API_KEY" = "$SMITHERY_API_KEY" }
+[windows.mcp_servers.clear-thought-mcp]
+command = "npx.cmd"
+args = ["-y", "@smithery/cli@latest", "run", "@ThinkFar/clear-thought-mcp"]
+env = { "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
 
-[mcp_servers.gmail-mcp]
-command = "npx"
-args = ["-y", "@smithery/cli@latest", "run", "@shinzo-labs/gmail-mcp", "--key", "--profile"]
-env = { "SMITHERY_API_KEY" = "$SMITHERY_API_KEY", "SMITHERY_PROFILE" = "$SMITHERY_PROFILE" }
+[windows.mcp_servers.gmail-mcp]
+command = "npx.cmd"
+args = ["-y", "@smithery/cli@latest", "run", "@shinzo-labs/gmail-mcp"]
+env = { "SMITHERY_API_KEY" = "SMITHERY_API_KEY", "SMITHERY_PROFILE" = "SMITHERY_PROFILE" }
 
-[mcp_servers.playwright-mcp]
-command = "npx"
-args = ["-y", "@smithery/cli@latest", "run", "@microsoft/playwright-mcp", "--key"]
-env = { "SMITHERY_API_KEY" = "$SMITHERY_API_KEY" }
+[windows.mcp_servers.playwright-mcp]
+command = "npx.cmd"
+args = ["-y", "@smithery/cli@latest", "run", "@playwright/mcp"]
+env = { "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
 
-[mcp_servers.context7]
+[windows.mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
 
-[mcp_servers.serena]
-url = "$SERENA_URL"
-startup_timeout_sec = 10.0
+[windows.mcp_servers.serena]
+url = "http://localhost:8765/sse"
+startup_timeout_sec = 10
 
-[mcp_servers.zen]
+[windows.mcp_servers.zen]
 command = "uvx"
-args = ["zen-mcp"]
+args = ["--from", "git+https://github.com/BeehiveInnovations/zen-mcp-server.git", "zen-mcp-server"]
 
-[mcp_servers.playwright]
-command = "npx"
-args = ["-y", "@microsoft/playwright-mcp"]
+[windows.mcp_servers.playwright]
+command = "npx.cmd"
+args = ["-y", "@playwright/mcp"]
 
-[mcp_servers.desktop-commander]
-command = "npx"
+[windows.mcp_servers.desktop-commander]
+command = "npx.cmd"
 args = ["-y", "@wonderwhy-er/desktop-commander"]
 
-[mcp_servers.gemini-cli-server]
-command = "gemini"
+[windows.mcp_servers.gemini-cli-server]
+command = "gemini.cmd"
+args = ["mcp", "server"]
+
+[wsl.mcp_servers.supabase]
+url = "https://server.smithery.ai/supabase/mcp"
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
+
+[wsl.mcp_servers.ref]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/npx"
+args = ["-y", "ref-tools-mcp"]
+
+[wsl.mcp_servers.exa]
+url = "https://server.smithery.ai/exa/mcp"
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
+
+[wsl.mcp_servers.sequential-thinking]
+url = "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
+
+[wsl.mcp_servers.browserbase]
+url = "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp"
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
+
+[wsl.mcp_servers.notion]
+url = "https://server.smithery.ai/notion/mcp"
+env_http_headers = { "SMITHERY_PROFILE" = "SMITHERY_PROFILE", "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
+
+[wsl.mcp_servers.clear-thought-mcp]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/npx"
+args = ["-y", "@smithery/cli@latest", "run", "@ThinkFar/clear-thought-mcp"]
+env = { "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
+
+[wsl.mcp_servers.gmail-mcp]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/npx"
+args = ["-y", "@smithery/cli@latest", "run", "@shinzo-labs/gmail-mcp"]
+env = { "SMITHERY_API_KEY" = "SMITHERY_API_KEY", "SMITHERY_PROFILE" = "SMITHERY_PROFILE" }
+
+[wsl.mcp_servers.playwright-mcp]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/npx"
+args = ["-y", "@smithery/cli@latest", "run", "@playwright/mcp"]
+env = { "SMITHERY_API_KEY" = "SMITHERY_API_KEY" }
+
+[wsl.mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+[wsl.mcp_servers.serena]
+url = "http://localhost:8765/sse"
+startup_timeout_sec = 10
+
+[wsl.mcp_servers.zen]
+command = "/home/matt/.local/bin/uvx"
+args = ["--from", "git+https://github.com/BeehiveInnovations/zen-mcp-server.git", "zen-mcp-server"]
+
+[wsl.mcp_servers.playwright]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/npx"
+args = ["-y", "@playwright/mcp"]
+
+[wsl.mcp_servers.desktop-commander]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/npx"
+args = ["-y", "@wonderwhy-er/desktop-commander"]
+
+[wsl.mcp_servers.gemini-cli-server]
+command = "/home/matt/.nvm/versions/node/v25.2.1/bin/gemini"
 args = ["mcp", "server"]

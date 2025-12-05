@@ -1,50 +1,30 @@
 {
   "mcpServers": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@microsoft/playwright-mcp"
-      ]
-    },
     "ref": {
       "type": "stdio",
-      "command": "npx",
+      "command": "npx.cmd",
       "args": [
         "-y",
         "ref-tools-mcp"
-      ]
-    },
-    "desktop-commander": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@wonderwhy-er/desktop-commander"
       ]
     },
     "sequential-thinking": {
       "type": "http",
       "url": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
     },
-    "context7": {
+    "browserbase": {
       "type": "http",
-      "httpUrl": "https://mcp.context7.com/mcp"
+      "url": "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp",
+      "env": {
+        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+      }
     },
     "zen": {
       "type": "stdio",
       "command": "uvx",
       "args": [
         "zen-mcp"
-      ]
-    },
-    "gemini-cli-server": {
-      "type": "stdio",
-      "command": "gemini",
-      "args": [
-        "mcp",
-        "server"
       ]
     }
   }

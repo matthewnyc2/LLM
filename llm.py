@@ -20,7 +20,6 @@ HISTORY_PATH = CONFIG_DIR / "history.log"
 
 DEFAULT_CONFIG = {
     "output_directory": "generated",
-    "location_type": "windows",
     "last_batch_server": None,
     "selected_llm": None,
     "selected_mcp_servers": [],
@@ -29,77 +28,117 @@ DEFAULT_CONFIG = {
 TEMPLATE_NAME_OVERRIDES = {
     "amazonq_mcp.json": "Amazon Q",
     "claude_code_mcp.json": "Claude Code (VSCode)",
-    "claude_desktop_config.json": "Claude Desktop",
     "cline_mcp_settings.json": "Cline",
     "gemini_cli_mcp.json": "Gemini CLI",
     "github_copilot_mcp.json": "GitHub Copilot",
     "kilo_code_mcp.json": "Kilo Code",
-    "opencode_config.json": "Opencode",
+    "qwen_mcp.json": "Qwen",
+    "opencode_config.json": "Open Coder",
     "codex_config.toml": "Codex",
 }
 
 CLI_LAUNCH_COMMANDS = {
-    "amazon_q": "q2",
-    "claude_code": "claude",
-    "claude_desktop": "claude",
-    "cline": "cline",
-    "gemini": "cmd /c start gemini",
-    "github_copilot": "copilot",
-    "kilo_code": "kilocode",
-    "opencode": "opencode",
-    "codex": "codex",
+    "amazon_q": {
+        "windows": r"C:\Users\matt\Dropbox\programs\batches\q2.bat",
+        "wsl": "/usr/bin/q"
+    },
+    "claude_code": {
+        "windows": "claude",
+        "wsl": "/home/matt/.local/bin/claude"
+    },
+    "cline": {
+        "windows": None,  # VS Code extension, not CLI launchable
+        "wsl": None
+    },
+    "gemini_cli": {
+        "windows": r"C:\Users\matt\AppData\Roaming\npm\gemini.cmd",
+        "wsl": "/home/matt/.nvm/versions/node/v25.2.1/bin/gemini"
+    },
+    "github_copilot": {
+        "windows": r'"C:\Program Files\GitHub CLI\gh.exe" copilot',
+        "wsl": "/usr/bin/gh copilot"
+    },
+    "kilo_code": {
+        "windows": r"C:\Users\matt\AppData\Roaming\npm\kilocode.cmd",
+        "wsl": "/home/matt/.nvm/versions/node/v25.2.1/bin/kilocode"
+    },
+    "opencode": {
+        "windows": r"C:\Users\matt\AppData\Roaming\npm\opencode.cmd",
+        "wsl": "/home/matt/.nvm/versions/node/v25.2.1/bin/opencode"
+    },
+    "qwen": {
+        "windows": r"C:\Users\matt\AppData\Roaming\npm\qwen.cmd",
+        "wsl": "/home/matt/.nvm/versions/node/v25.2.1/bin/qwen"
+    },
+    "codex": {
+        "windows": r"C:\Users\matt\AppData\Roaming\npm\codex.cmd",
+        "wsl": "/home/matt/.nvm/versions/node/v25.2.1/bin/codex"
+    },
 }
 
 APP_LOCATIONS = {
     "windows": {
         "amazonq_mcp.json": r"%USERPROFILE%\.aws\amazonq\mcp.json",
         "claude_code_mcp.json": r"%USERPROFILE%\.claude.json",
-        "claude_desktop_config.json": r"%APPDATA%\Claude\claude_desktop_config.json",
         "cline_mcp_settings.json": r"%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json",
         "gemini_cli_mcp.json": r"%USERPROFILE%\.gemini\settings.json",
         "github_copilot_mcp.json": r"%APPDATA%\Code\User\settings.json",
-        "kilo_code_mcp.json": r"%APPDATA%\Code\User\globalStorage\kilocode.kilo-code\settings\mcp_settings.json",
+        "kilo_code_mcp.json": r"%USERPROFILE%\.kilocode\cli\global\settings\mcp_settings.json",
+        "qwen_mcp.json": r"%APPDATA%\Code\User\globalStorage\qwen.qwen\settings\mcp_settings.json",
         "opencode_config.json": r"%USERPROFILE%\.config\opencode\opencode.json",
         "codex_config.toml": r"%USERPROFILE%\.codex\config.toml",
     },
-    "unix": {
+    "wsl": {
         "amazonq_mcp.json": "~/.aws/amazonq/mcp.json",
         "claude_code_mcp.json": "~/.claude.json",
-        "claude_desktop_config.json": "~/Library/Application Support/Claude/claude_desktop_config.json",
         "cline_mcp_settings.json": "~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
         "gemini_cli_mcp.json": "~/.gemini/settings.json",
         "github_copilot_mcp.json": "~/.config/Code/User/settings.json",
-        "kilo_code_mcp.json": "~/.config/Code/User/globalStorage/kilocode.kilo-code/settings/mcp_settings.json",
+        "kilo_code_mcp.json": "~/.kilocode/cli/global/settings/mcp_settings.json",
+        "qwen_mcp.json": "~/.config/Code/User/globalStorage/qwen.qwen/settings/mcp_settings.json",
         "opencode_config.json": "~/.config/opencode/opencode.json",
         "codex_config.toml": "~/.codex/config.toml",
-    },
-    "project": {
-        "amazonq_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.amazonq\mcp.json",
-        "claude_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.mcp.json",
-        "claude_desktop_config.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.claude_desktop_config.json",
-        "cline_mcp_settings.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.clinerules",
-        "gemini_cli_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.gemini\settings.json",
-        "github_copilot_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.vscode\mcp.json",
-        "kilo_code_mcp.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.kilocode\mcp.json",
-        "opencode_config.json": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\opencode.json",
-        "codex_config.toml": r"C:\Users\matt\Dropbox\projects\MAILSHIELD\.codex\config.toml",
     },
 }
 
 
+def get_project_locations() -> Dict[str, str]:
+    """Generate project-specific locations based on current working directory."""
+    cwd = Path.cwd()
+    project_dir = cwd  # Use the current directory as the project directory
+    
+    return {
+        "amazonq_mcp.json": str(project_dir / ".amazonq" / "mcp.json"),
+        "claude_code_mcp.json": str(project_dir / ".mcp.json"),
+        "cline_mcp_settings.json": str(project_dir / ".clinerules"),
+        "gemini_cli_mcp.json": str(project_dir / ".gemini" / "settings.json"),
+        "github_copilot_mcp.json": str(project_dir / ".vscode" / "mcp.json"),
+        "kilo_code_mcp.json": str(project_dir / ".kilocode" / "mcp.json"),
+        "qwen_mcp.json": str(project_dir / ".qwen" / "mcp.json"),
+        "opencode_config.json": str(project_dir / "opencode.json"),
+        "codex_config.toml": str(project_dir / ".codex" / "config.toml"),
+    }
+
+
 @dataclass
 class ServerTemplate:
-    """Represents a configuration template for a particular application."""
+    """Represents a configuration template for a particular application and OS."""
 
     filename: str
     display_name: str
     path: Path
     format: str  # json or toml
+    os_mode: str # windows or wsl
     server_order: List[str]
     server_blocks: Dict[str, object]
     metadata: Dict[str, object]
     container_key: Optional[str] = None
     header_lines: Optional[List[str]] = None
+
+    @property
+    def unique_id(self) -> str:
+        """Unique identifier for this template (filename + os_mode)."""
+        return f"{self.filename}::{self.os_mode}"
 
     def render(self, selected_servers: Sequence[str]) -> str:
         """Render the template including only the selected servers."""
@@ -113,6 +152,9 @@ class ServerTemplate:
                 container[name] = copy.deepcopy(servers[name])
             if self.container_key is None:
                 raise RuntimeError("JSON template missing container key")
+            
+            # For JSON, we are rendering the final config file, so we don't need the 'windows'/'wsl' wrapper anymore.
+            # We just output the container key (e.g. mcpServers) at the root level (or wherever it belongs).
             payload[self.container_key] = container
             return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
 
@@ -124,9 +166,27 @@ class ServerTemplate:
                     lines.append("")
             for name in ordered_names:
                 block_lines = self.server_blocks[name]
-                lines.extend(block_lines)
+                # We need to strip the [windows.mcpServers...] or [wsl.mcpServers...] prefix
+                # and replace it with standard [mcpServers...] or whatever the target expects.
+                # Assuming target expects [mcpServers.name] or [mcp_servers.name].
+                # Based on previous file content, it seems target expects [mcp_servers.name] or similar.
+                # Let's look at how we parsed it.
+                
+                # If we parsed `[windows.mcpServers.supabase]`, we want to output `[mcpServers.supabase]` (or snake_case if that's what it was).
+                # The codex_config.toml uses `mcpServers` in my update.
+                
+                for line in block_lines:
+                    # Replace the OS-specific section header with the generic one
+                    if line.strip().startswith(f"[{self.os_mode}."):
+                        # e.g. [windows.mcpServers.supabase] -> [mcpServers.supabase]
+                        new_line = line.replace(f"[{self.os_mode}.", "[", 1)
+                        lines.append(new_line)
+                    else:
+                        lines.append(line)
+                
                 if block_lines and block_lines[-1].strip():
                     lines.append("")
+            
             # Remove trailing empty lines and ensure newline at end.
             while lines and not lines[-1].strip():
                 lines.pop()
@@ -154,7 +214,6 @@ def load_config() -> Dict[str, object]:
     except (OSError, json.JSONDecodeError):
         config = copy.deepcopy(DEFAULT_CONFIG)
     config.setdefault("output_directory", DEFAULT_CONFIG["output_directory"])
-    config.setdefault("location_type", DEFAULT_CONFIG["location_type"])
     config.setdefault("last_batch_server", DEFAULT_CONFIG["last_batch_server"])
     config.setdefault("selected_llm", DEFAULT_CONFIG["selected_llm"])
     config.setdefault("selected_mcp_servers", DEFAULT_CONFIG["selected_mcp_servers"])
@@ -208,30 +267,46 @@ def friendly_name(filename: str) -> str:
     return stem.title()
 
 
-def load_json_template(path: Path) -> ServerTemplate:
+def load_json_template(path: Path, os_mode: str) -> ServerTemplate:
     with path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
 
+    if os_mode not in data:
+        raise ValueError(f"Missing '{os_mode}' configuration in {path.name}")
+    
+    os_data = data[os_mode]
+    
     container_key = None
     for key in ("mcpServers", "mcp_servers", "mcp"):
-        if key in data:
+        if key in os_data:
             container_key = key
             break
     if container_key is None:
-        raise ValueError(f"Could not locate MCP server container in {path}")
+        raise ValueError(f"Could not locate MCP server container in {path} for {os_mode}")
 
-    servers = data[container_key]
+    servers = os_data[container_key]
     if not isinstance(servers, dict):
-        raise ValueError(f"Unexpected server container type in {path}")
+        raise ValueError(f"Unexpected server container type in {path} for {os_mode}")
 
-    metadata = {key: value for key, value in data.items() if key != container_key}
+    # Metadata is everything else in the OS block + top level if needed?
+    # For now, let's assume metadata is everything in the OS block except the container key.
+    metadata = {key: value for key, value in os_data.items() if key != container_key}
+    
+    # Also merge top-level metadata if it exists and isn't 'windows' or 'wsl'
+    for key, value in data.items():
+        if key not in ("windows", "wsl"):
+            metadata[key] = value
+
     server_order = list(servers.keys())
+    
+    display_os = "Windows" if os_mode == "windows" else "WSL"
 
     return ServerTemplate(
         filename=path.name,
-        display_name=friendly_name(path.name),
+        display_name=f"{friendly_name(path.name)} ({display_os})",
         path=path,
         format="json",
+        os_mode=os_mode,
         server_order=server_order,
         server_blocks=servers,
         metadata=metadata,
@@ -239,45 +314,87 @@ def load_json_template(path: Path) -> ServerTemplate:
     )
 
 
-def load_toml_template(path: Path) -> ServerTemplate:
+def load_toml_template(path: Path, os_mode: str) -> ServerTemplate:
     header_lines: List[str] = []
     server_blocks: Dict[str, List[str]] = {}
     server_order: List[str] = []
 
     current_name: Optional[str] = None
     current_block: List[str] = []
+    
+    # Prefix to look for: e.g. [windows.mcp_servers. or [windows.mcpServers.
+    # Codex uses mcp_servers, others might use mcpServers
+    prefixes = [f"[{os_mode}.mcp_servers.", f"[{os_mode}.mcpServers."]
+    other_os = "wsl" if os_mode == "windows" else "windows"
+    other_prefixes = [f"[{other_os}.mcp_servers.", f"[{other_os}.mcpServers."]
 
     with path.open("r", encoding="utf-8") as handle:
         for raw_line in handle:
             line = raw_line.rstrip("\n")
-            if current_name is None:
-                if line.startswith("[mcp_servers."):
-                    current_name = line[len("[mcp_servers.") :].rstrip("]")
+            
+            # Check if this line starts a server block for our OS
+            matched_prefix = None
+            for prefix in prefixes:
+                if line.strip().startswith(prefix):
+                    matched_prefix = prefix
+                    break
+            
+            if matched_prefix:
+                # Save previous block if it was for our OS
+                if current_name is not None:
+                    server_blocks[current_name] = current_block
+                
+                # Start new block
+                # Extract name: [windows.mcp_servers.name] -> name
+                # Remove prefix and trailing ]
+                content = line.strip()[len(matched_prefix):].rstrip("]")
+                # Handle nested keys like [windows.mcp_servers.server.env]
+                current_name = content.split(".")[0]
+                if current_name not in server_order:
                     server_order.append(current_name)
                     current_block = [line]
                 else:
-                    header_lines.append(line)
-            else:
-                if line.startswith("[mcp_servers."):
+                    # This is a sub-table for an existing server
+                    server_blocks[current_name].append(line)
+                    current_name = content.split(".")[0]  # Keep tracking the same server
+                    current_block = server_blocks[current_name]
+            
+            elif current_name is not None:
+                # We are inside a block for our OS
+                # Check if we hit a block for the OTHER OS
+                is_other_os = any(line.strip().startswith(op) for op in other_prefixes)
+                
+                if is_other_os:
+                    # End of our block, start of irrelevant block
                     server_blocks[current_name] = current_block
-                    current_name = line[len("[mcp_servers.") :].rstrip("]")
-                    server_order.append(current_name)
-                    current_block = [line]
+                    current_name = None
+                    current_block = []
                 else:
                     current_block.append(line)
+            else:
+                # Header lines or irrelevant blocks
+                # We only want header lines that are NOT for the other OS
+                # This is tricky with TOML structure. 
+                # For now, assume top-level keys are shared or we just take them?
+                # But wait, the file structure is:
+                # [windows.mcp_servers.x]
+                # ...
+                # [wsl.mcp_servers.x]
+                # ...
+                # So there might not be global headers.
+                pass
 
     if current_name is not None:
         server_blocks[current_name] = current_block
 
-    # Remove trailing blank header lines.
-    while header_lines and not header_lines[-1].strip():
-        header_lines.pop()
+    display_os = "Windows" if os_mode == "windows" else "WSL"
 
     return ServerTemplate(
         filename=path.name,
-        display_name=friendly_name(path.name),
+        display_name=f"{friendly_name(path.name)} ({display_os})",
         path=path,
         format="toml",
+        os_mode=os_mode,
         server_order=server_order,
         server_blocks=server_blocks,
         metadata={},
@@ -292,15 +409,27 @@ def load_templates() -> List[ServerTemplate]:
             continue
         if path.suffix.lower() not in {".json", ".toml"}:
             continue
+        
+        # Load for Windows
         try:
             if path.suffix.lower() == ".json":
-                template = load_json_template(path)
+                t_win = load_json_template(path, "windows")
             else:
-                template = load_toml_template(path)
+                t_win = load_toml_template(path, "windows")
+            templates.append(t_win)
         except ValueError as exc:
-            print(f"Skipping {path.name}: {exc}")
-            continue
-        templates.append(template)
+            print(f"Skipping Windows template for {path.name}: {exc}")
+
+        # Load for WSL
+        try:
+            if path.suffix.lower() == ".json":
+                t_wsl = load_json_template(path, "wsl")
+            else:
+                t_wsl = load_toml_template(path, "wsl")
+            templates.append(t_wsl)
+        except ValueError as exc:
+            print(f"Skipping WSL template for {path.name}: {exc}")
+
     return templates
 
 
@@ -312,14 +441,27 @@ def get_all_mcp_servers(templates: List[ServerTemplate]) -> List[str]:
     return sorted(all_servers)
 
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def print_centered(text: str):
+    columns = shutil.get_terminal_size().columns
+    print(text.center(columns))
+
+
 def select_llm(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
     """Screen to select LLM with numbered list."""
-    print("\n=== Select LLM ===")
-    options = [template.display_name for template in templates]
+    clear_screen()
+    print_centered("=== Select LLM Application ===")
+    print()
     
-    for idx, name in enumerate(options, start=1):
-        print(f"  {idx}. {name}")
+    options = templates # templates are already distinct objects
+    
+    for idx, template in enumerate(options, start=1):
+        print(f"  {idx}. {template.display_name}")
     print("  X. Cancel")
+    print()
     
     choice = input("Select LLM: ").strip().lower()
     if choice == "x":
@@ -328,13 +470,14 @@ def select_llm(templates: List[ServerTemplate], config: Dict[str, object]) -> No
     if choice.isdigit():
         index = int(choice)
         if 1 <= index <= len(options):
-            selected_template = templates[index - 1]
-            config["selected_llm"] = selected_template.filename
+            selected_template = options[index - 1]
+            config["selected_llm"] = selected_template.unique_id
             save_config(config)
-            print(f"Selected: {selected_template.display_name}\n")
+            print(f"\nSelected: {selected_template.display_name}")
             return
     
-    print("Invalid selection.\n")
+    print("Invalid selection.")
+    input("Press Enter to continue...")
 
 
 def select_mcp_servers(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
@@ -343,12 +486,16 @@ def select_mcp_servers(templates: List[ServerTemplate], config: Dict[str, object
     selected_servers = set(config.get("selected_mcp_servers", []))
     
     while True:
-        print("\n=== Select MCP Servers ===")
+        clear_screen()
+        print_centered("=== Select MCP Servers ===")
+        print()
+        
         for idx, server in enumerate(all_servers, start=1):
             mark = "[x]" if server in selected_servers else "[ ]"
             print(f"  {idx:>2}. {mark} {server}")
         print("  A. Toggle all")
         print("  X. Return to main menu")
+        print()
         
         choice = input("Select server to toggle: ").strip().lower()
         if choice == "x":
@@ -376,20 +523,22 @@ def select_mcp_servers(templates: List[ServerTemplate], config: Dict[str, object
 
 def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
     """Launch LLM and replace its config with selected MCP servers."""
-    selected_llm = config.get("selected_llm")
-    if not selected_llm:
+    selected_id = config.get("selected_llm")
+    if not selected_id:
         print("No LLM selected. Please select an LLM first.\n")
+        input("Press Enter to continue...")
         return
     
     # Find the template
     template = None
     for t in templates:
-        if t.filename == selected_llm:
+        if t.unique_id == selected_id:
             template = t
             break
     
     if not template:
         print("Selected LLM template not found.\n")
+        input("Press Enter to continue...")
         return
     
     selected_servers = config.get("selected_mcp_servers", [])
@@ -400,6 +549,9 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         output_directory = CONFIG_DIR / output_directory
     output_directory.mkdir(parents=True, exist_ok=True)
     
+    # Output filename might need to be unique if we have multiple configs for same file?
+    # But usually we just overwrite the target.
+    # For generated file, let's keep original filename.
     output_path = output_directory / template.filename
     
     # Create new server blocks with only selected servers
@@ -409,11 +561,13 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
             filtered_blocks[server] = template.server_blocks[server]
     
     # Create temporary template with filtered servers
+    # We can reuse the template object but with filtered blocks
     temp_template = ServerTemplate(
         filename=template.filename,
         display_name=template.display_name,
         path=template.path,
         format=template.format,
+        os_mode=template.os_mode,
         server_order=[s for s in template.server_order if s in selected_servers],
         server_blocks=filtered_blocks,
         metadata=template.metadata,
@@ -425,9 +579,9 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
     with output_path.open("w", encoding="utf-8") as handle:
         handle.write(document)
     
-    # Copy to app location
-    location_type = config.get("location_type", "windows")
-    locations = APP_LOCATIONS.get(location_type, {})
+    # Copy to app locations (both OS-specific and project-specific)
+    # 1. Deploy to OS-specific location (windows/wsl)
+    locations = APP_LOCATIONS.get(template.os_mode, {})
     if template.filename in locations:
         app_location_raw = locations[template.filename]
         app_location = Path(os.path.expandvars(app_location_raw)).expanduser()
@@ -435,9 +589,24 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         
         try:
             shutil.copy2(output_path, app_location)
-            print(f"Updated config at {app_location}")
+            print(f"✓ Updated config at {app_location}")
         except Exception as exc:
-            print(f"Failed to copy config: {exc}")
+            print(f"✗ Failed to copy config to {app_location}: {exc}")
+    else:
+        print(f"No configuration path defined for {template.filename} in {template.os_mode}")
+    
+    # 2. Deploy to project-specific location
+    project_locations = get_project_locations()
+    if template.filename in project_locations:
+        project_location = Path(project_locations[template.filename])
+        project_location.parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            shutil.copy2(output_path, project_location)
+            print(f"✓ Updated project config at {project_location}")
+        except Exception as exc:
+            print(f"✗ Failed to copy to project location {project_location}: {exc}")
+
     
     # Launch LLM
     cli_key = template.filename.replace(".json", "").replace(".toml", "").replace("_mcp", "").replace("_settings", "").replace("_config", "")
@@ -446,36 +615,53 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         "claude_code": "claude_code",
         "claude_desktop": "claude_desktop",
         "cline": "cline",
-        "gemini_cli": "gemini",
+        "gemini_cli": "gemini_cli",
         "github_copilot": "github_copilot",
         "kilo_code": "kilo_code",
         "opencode": "opencode",
+        "qwen": "qwen",
         "codex": "codex",
     }
     
     cli_key = cli_map.get(cli_key, cli_key)
-    cmd = CLI_LAUNCH_COMMANDS.get(cli_key)
+    
+    cmd_config = CLI_LAUNCH_COMMANDS.get(cli_key)
+    if cmd_config and isinstance(cmd_config, dict):
+        cmd = cmd_config.get(template.os_mode)
+    else:
+        cmd = None
     
     if cmd:
-        print(f"Launching {template.display_name}...\n")
-        log_history("launch_llm", {"template": template.filename, "command": cmd})
-        try:
-            # Special handling for Cline on Windows - use WSL
-            if sys.platform == "win32" and cli_key == "cline":
-                subprocess.Popen(["wsl", "-e", "bash", "-c", cmd])
-            elif sys.platform == "win32":
-                subprocess.Popen(f"start {cmd}", shell=True)
+        clear_screen()
+        print_centered(f"Launching {template.display_name}...")
+        print_centered(f"Command: {cmd}")
+        print()
+        
+        log_history("launch_llm", {"template": template.unique_id, "command": cmd})
+        
+        # Special handling for WSL commands on Windows if we are running python on Windows
+        if sys.platform == "win32" and template.os_mode == "wsl":
+            # If the command is just 'cline' or 'gemini', we might need 'wsl -e bash -c "..."'
+            # But if the user configured 'wsl' command to be 'wsl ...', then we just run it.
+            # Our CLI_LAUNCH_COMMANDS for wsl just say "gemini", "cline", etc.
+            # So we should wrap them in wsl call if we are on Windows.
+            full_cmd = f'wsl -e bash -c "{cmd}"'
+            subprocess.run(full_cmd, shell=True)
+        else:
+            # Run directly in current terminal for proper interaction
+            if sys.platform == "win32":
+                os.system(cmd)
             else:
-                subprocess.Popen([cmd])
-        except Exception as exc:
-            print(f"Failed to launch {template.display_name}: {exc}\n")
+                subprocess.run(cmd, shell=True)
     else:
         print(f"No launch command configured for {template.display_name}\n")
+        input("Press Enter to continue...")
 
 
 def batch_commands(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
     """Batch command mode with simplified interface."""
-    print("\n=== Batch Commands ===")
+    clear_screen()
+    print_centered("=== Batch Commands ===")
     print("Enter commands and select which LLM to execute them with.")
     print("Press Ctrl+C to exit.\n")
     
@@ -487,20 +673,20 @@ def batch_commands(templates: List[ServerTemplate], config: Dict[str, object]) -
             
             # Show LLM options
             print("\nSelect LLM:")
-            options = [template.display_name for template in templates]
+            options = templates
             
             # Get last used or default
-            last_server = config.get("last_batch_server")
+            last_server_id = config.get("last_batch_server")
             default_idx = None
-            if last_server:
+            if last_server_id:
                 for idx, template in enumerate(templates):
-                    if template.filename == last_server:
+                    if template.unique_id == last_server_id:
                         default_idx = idx
                         break
             
-            for idx, name in enumerate(options, start=1):
+            for idx, template in enumerate(options, start=1):
                 marker = " (default)" if default_idx is not None and idx - 1 == default_idx else ""
-                print(f"  {idx}. {name}{marker}")
+                print(f"  {idx}. {template.display_name}{marker}")
             print("  X. Cancel")
             
             choice = input("Select LLM (Enter for default): ").strip().lower()
@@ -524,13 +710,25 @@ def batch_commands(templates: List[ServerTemplate], config: Dict[str, object]) -
                 continue
             
             selected_template = templates[selected_idx]
-            config["last_batch_server"] = selected_template.filename
+            config["last_batch_server"] = selected_template.unique_id
             save_config(config)
             
             print(f"Executing with {selected_template.display_name}: {cmd}\n")
-            log_history("batch_command", {"template": selected_template.filename, "command": cmd})
+            log_history("batch_command", {"template": selected_template.unique_id, "command": cmd})
             
             try:
+                # For batch commands, we might want to use the same launch logic (wsl vs windows)
+                # But batch commands usually imply running the LLM with arguments?
+                # Or is this running a system command?
+                # The original code ran `subprocess.run(cmd, shell=True)`.
+                # This seems to be running a shell command, not the LLM itself.
+                # So the "Select LLM" here is just for logging/context? 
+                # Or does it imply running the command IN the environment of the LLM?
+                # Original code just ran `subprocess.run(cmd)`. 
+                # It seems the "Select LLM" was just to record "I am doing this for X".
+                # OR, maybe it was intended to wrap the command?
+                # Given the original code, it just runs the command locally.
+                
                 result = subprocess.run(cmd, shell=True, capture_output=False)
                 if result.returncode != 0:
                     print(f"Command exited with code {result.returncode}")
@@ -546,13 +744,19 @@ def batch_commands(templates: List[ServerTemplate], config: Dict[str, object]) -
 
 def show_main_menu(config: Dict[str, object]) -> None:
     """Show simplified main menu."""
-    print("\n=== MCP Configuration Builder ===")
+    clear_screen()
+    print_centered("=== MCP Configuration Manager ===")
+    print()
     
     # Show selected LLM
-    selected_llm = config.get("selected_llm")
-    if selected_llm:
-        llm_name = friendly_name(selected_llm)
-        print(f"Selected LLM: {llm_name}")
+    selected_id = config.get("selected_llm")
+    if selected_id:
+        # We need templates to look up name, but we don't have them passed here.
+        # We can just show the ID or try to parse it.
+        # Ideally we pass templates or look it up.
+        # For simplicity, let's just print the ID or a placeholder.
+        # Or better, load templates in main loop and pass them.
+        print(f"Selected LLM: {selected_id}") 
     else:
         print("Selected LLM: None")
     
@@ -566,12 +770,13 @@ def show_main_menu(config: Dict[str, object]) -> None:
     print("===============================\n")
     
     print("Options:")
-    print("  1. Select LLM")
+    print("  1. Select LLM Application")
     print("  2. Select MCP Servers") 
-    print("  3. Launch LLM")
+    print("  3. Launch Application")
     print("  4. Batch Commands")
     print("  5. History")
     print("  6. Exit")
+    print()
 
 
 def main() -> None:
@@ -584,7 +789,40 @@ def main() -> None:
     config = load_config()
 
     while True:
-        show_main_menu(config)
+        # Update display name for selected LLM if possible
+        selected_id = config.get("selected_llm")
+        display_name = "None"
+        if selected_id:
+            for t in templates:
+                if t.unique_id == selected_id:
+                    display_name = t.display_name
+                    break
+        
+        clear_screen()
+        print_centered("=== MCP Configuration Manager ===")
+        print()
+        print_centered(f"Selected LLM: {display_name}")
+        
+        selected_servers = config.get("selected_mcp_servers", [])
+        server_str = ", ".join(selected_servers) if selected_servers else "None"
+        # Truncate if too long
+        if len(server_str) > 60:
+            server_str = server_str[:57] + "..."
+        print_centered(f"MCP Servers: {server_str}")
+        
+        print("==================================================".center(shutil.get_terminal_size().columns))
+        print()
+        
+        # Centered options? Or just left aligned in center?
+        # Let's keep standard left aligned menu for readability
+        print("  1. Select LLM Application")
+        print("  2. Select MCP Servers") 
+        print("  3. Launch Application")
+        print("  4. Batch Commands")
+        print("  5. History")
+        print("  6. Exit")
+        print()
+        
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
@@ -597,11 +835,13 @@ def main() -> None:
             batch_commands(templates, config)
         elif choice == "5":
             display_history()
+            input("Press Enter to continue...")
         elif choice == "6":
             print("Goodbye!")
             break
         else:
-            print("Invalid option.\n")
+            print("Invalid option.")
+            input("Press Enter to continue...")
 
 
 if __name__ == "__main__":

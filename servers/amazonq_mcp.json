@@ -1,132 +1,262 @@
 {
-  "mcpServers": {
-    "supabase": {
-      "type": "http",
-      "url": "https://server.smithery.ai/supabase/mcp",
-      "env": {
-        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+  "windows": {
+    "mcpServers": {
+      "supabase": {
+        "type": "http",
+        "url": "https://server.smithery.ai/supabase/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "ref": {
+        "type": "stdio",
+        "command": "npx.cmd",
+        "args": [
+          "-y",
+          "ref-tools-mcp"
+        ]
+      },
+      "exa": {
+        "type": "http",
+        "url": "https://server.smithery.ai/exa/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "sequential-thinking": {
+        "type": "http",
+        "url": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
+      },
+      "browserbase": {
+        "type": "http",
+        "url": "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "notion": {
+        "type": "http",
+        "url": "https://server.smithery.ai/notion/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "clear-thought-mcp": {
+        "type": "stdio",
+        "command": "npx.cmd",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@ThinkFar/clear-thought-mcp"
+        ],
+        "env": {
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "gmail-mcp": {
+        "type": "stdio",
+        "command": "npx.cmd",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@shinzo-labs/gmail-mcp"
+        ],
+        "env": {
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}",
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}"
+        }
+      },
+      "playwright-mcp": {
+        "type": "stdio",
+        "command": "npx.cmd",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@playwright/mcp"
+        ],
+        "env": {
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "context7": {
+        "type": "http",
+        "url": "https://mcp.context7.com/mcp"
+      },
+      "serena": {
+        "type": "http",
+        "url": "http://localhost:8765/sse",
+        "timeout": 10000
+      },
+      "zen": {
+        "type": "stdio",
+        "command": "uvx",
+        "args": [
+          "--from",
+          "git+https://github.com/BeehiveInnovations/zen-mcp-server.git",
+          "zen-mcp-server"
+        ]
+      },
+      "playwright": {
+        "type": "stdio",
+        "command": "npx.cmd",
+        "args": [
+          "-y",
+          "@playwright/mcp"
+        ]
+      },
+      "desktop-commander": {
+        "type": "stdio",
+        "command": "npx.cmd",
+        "args": [
+          "-y",
+          "@wonderwhy-er/desktop-commander"
+        ]
+      },
+      "gemini-cli-server": {
+        "type": "stdio",
+        "command": "gemini.cmd",
+        "args": [
+          "mcp",
+          "server"
+        ]
       }
-    },
-    "ref": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "ref-tools-mcp"
-      ]
-    },
-    "exa": {
-      "type": "http",
-      "url": "https://server.smithery.ai/exa/mcp",
-      "env": {
-        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+    }
+  },
+  "wsl": {
+    "mcpServers": {
+      "supabase": {
+        "type": "http",
+        "url": "https://server.smithery.ai/supabase/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "ref": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/npx",
+        "args": [
+          "-y",
+          "ref-tools-mcp"
+        ]
+      },
+      "exa": {
+        "type": "http",
+        "url": "https://server.smithery.ai/exa/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "sequential-thinking": {
+        "type": "http",
+        "url": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
+      },
+      "browserbase": {
+        "type": "http",
+        "url": "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "notion": {
+        "type": "http",
+        "url": "https://server.smithery.ai/notion/mcp",
+        "headers": {
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "clear-thought-mcp": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@ThinkFar/clear-thought-mcp"
+        ],
+        "env": {
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "gmail-mcp": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@shinzo-labs/gmail-mcp"
+        ],
+        "env": {
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}",
+          "SMITHERY_PROFILE": "${SMITHERY_PROFILE}"
+        }
+      },
+      "playwright-mcp": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@playwright/mcp"
+        ],
+        "env": {
+          "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
+        }
+      },
+      "context7": {
+        "type": "http",
+        "url": "https://mcp.context7.com/mcp"
+      },
+      "serena": {
+        "type": "http",
+        "url": "http://localhost:8765/sse",
+        "timeout": 10000
+      },
+      "zen": {
+        "type": "stdio",
+        "command": "/home/matt/.local/bin/uvx",
+        "args": [
+          "--from",
+          "git+https://github.com/BeehiveInnovations/zen-mcp-server.git",
+          "zen-mcp-server"
+        ]
+      },
+      "playwright": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/npx",
+        "args": [
+          "-y",
+          "@playwright/mcp"
+        ]
+      },
+      "desktop-commander": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/npx",
+        "args": [
+          "-y",
+          "@wonderwhy-er/desktop-commander"
+        ]
+      },
+      "gemini-cli-server": {
+        "type": "stdio",
+        "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/gemini",
+        "args": [
+          "mcp",
+          "server"
+        ]
       }
-    },
-    "sequential-thinking": {
-      "type": "http",
-      "url": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
-    },
-    "browserbase": {
-      "type": "http",
-      "url": "https://server.smithery.ai/@browserbasehq/mcp-browserbase/mcp",
-      "env": {
-        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
-      }
-    },
-    "notion": {
-      "type": "http",
-      "url": "https://server.smithery.ai/notion/mcp",
-      "env": {
-        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}",
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
-      }
-    },
-    "clear-thought-mcp": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@ThinkFar/clear-thought-mcp",
-        "--key"
-      ],
-      "env": {
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
-      }
-    },
-    "gmail-mcp": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@shinzo-labs/gmail-mcp",
-        "--key",
-        "--profile"
-      ],
-      "env": {
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}",
-        "SMITHERY_PROFILE": "${SMITHERY_PROFILE}"
-      }
-    },
-    "playwright-mcp": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@microsoft/playwright-mcp",
-        "--key"
-      ],
-      "env": {
-        "SMITHERY_API_KEY": "${SMITHERY_API_KEY}"
-      }
-    },
-    "context7": {
-      "type": "http",
-      "url": "https://mcp.context7.com/mcp"
-    },
-    "serena": {
-      "type": "http",
-      "url": "${SERENA_URL:-http://localhost:8765/sse}",
-      "timeout": 10000
-    },
-    "zen": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "zen-mcp"
-      ]
-    },
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@microsoft/playwright-mcp"
-      ]
-    },
-    "desktop-commander": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@wonderwhy-er/desktop-commander"
-      ]
-    },
-    "gemini-cli-server": {
-      "type": "stdio",
-      "command": "gemini",
-      "args": [
-        "mcp",
-        "server"
-      ]
     }
   }
 }

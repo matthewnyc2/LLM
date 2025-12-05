@@ -14,13 +14,13 @@
     ]
   },
   "location_type": "windows",
-  "last_batch_server": "amazonq_mcp.json",
-  "selected_llm": "codex_config.toml",
+  "last_batch_server": "kilo_code_mcp.json",
+  "selected_llm": "codex_config.toml::windows",
   "selected_mcp_servers": [
+    "sequential-thinking",
+    "playwright-mcp.env",
     "context7",
-    "browserbase",
-    "exa",
-    "playwright-mcp"
+    "ref"
   ],
   "last_batch_llm": null
 }
