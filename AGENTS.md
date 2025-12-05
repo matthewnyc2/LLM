@@ -37,3 +37,23 @@
 - Agent builder saves markdown to per‑tool subfolders under `AGENT_SAVE_PATH` with file‑safe names (e.g., `code_reviewer.md`).
 - When editing templates in `servers/`, keep server keys stable; these drive selection and rendering order.
 
+
+## Example specialized agent (scaffolded)
+
+- `code_reviewer_small_patch` — a focused agent that, given a failing test and a small repo snapshot, produces exactly one JSON object describing a minimal patch to fix the failing test plus commands to validate the fix.
+
+Files added for the example:
+
+- `.amazonq/agents/code_reviewer_small_patch.json` — agent manifest (allowed tools, prompt, resources).
+- `tests/agents/code_reviewer/sample-1/` — example failing output, a tiny repo snapshot and test, and `expected_output.json` describing the expected agent result.
+- `tools/agent_test_runner.py` — small validation harness that applies the provided unified diff to the snapshot and verifies the test passes using pytest.
+
+To run the developer harness locally:
+
+```pwsh
+python -m pip install -r requirements.txt  # ensure deps installed (pytest is required)
+python tools/agent_test_runner.py
+```
+
+This is intended as a minimal local developer tool for iterating on agent output. Do not enable agent write/apply operations in production without review and proper sandboxing.
+

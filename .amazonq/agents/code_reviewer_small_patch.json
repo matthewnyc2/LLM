@@ -1,0 +1,26 @@
+{
+  "name": "code_reviewer_small_patch",
+  "description": "Specialized agent that proposes a single minimal patch to fix a failing test or lint error.",
+  "prompt": "You are a precise code-review agent. Input consists of a failing test output and a small repository snapshot. Produce EXACTLY one JSON object in the format described in the operator documentation.\n\nOutput structure: {\n  \"summary\": \"short one-line summary\",\n  \"confidence\": float (0.0-1.0),\n  \"patch\": {\n     \"file\": \"relative/path/to/file\",\n     \"diff\": \"unified diff text\"\n  },\n  \"validation\": {\n     \"commands_to_verify\": [\"pytest -q tests/..\"],\n     \"expected_result_after_patch\": \"1 test passed\"\n  }\n}\n\nIf you cannot produce a safe minimal patch, return patch=null and explain in summary. Do not output commentary or extra text outside the JSON object.",
+  "mcpServers": {},
+  "tools": [
+    "fs_read",
+    "fileSearch",
+    "codeReview",
+    "displayFindings"
+  ],
+  "allowedTools": [
+    "fs_read",
+    "fileSearch",
+    "codeReview"
+  ],
+  "toolsSettings": {
+    "execute_bash": { "alwaysAllow": [{ "preset": "readOnly" }] }
+  },
+  "resources": [
+    "file://AGENTS.md",
+    "file://README.md"
+  ],
+  "hooks": { "agentSpawn": [], "userPromptSubmit": [] },
+  "useLegacyMcpJson": true
+}
