@@ -1,0 +1,62 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Commit Writer: Inspect commits (dry-run)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "tools/commit_writer_runner.py",
+        "--scope",
+        "HEAD~20..HEAD",
+        "--out",
+        "commit_writer_proposals.json"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Commit Writer: Generate apply script",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "tools/commit_writer_runner.py",
+        "--scope",
+        "HEAD~20..HEAD",
+        "--apply",
+        "--out",
+        "commit_writer_proposals.json"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Commit Writer: Apply rewrites (confirm)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "tools/commit_writer_runner.py",
+        "--scope",
+        "HEAD~20..HEAD",
+        "--apply",
+        "--confirm",
+        "--out",
+        "commit_writer_proposals.json"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

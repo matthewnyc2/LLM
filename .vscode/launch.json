@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Commit Writer (inspect)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/commit_writer_runner.py",
+      "console": "integratedTerminal",
+      "args": ["--scope", "HEAD~20..HEAD", "--out", "commit_writer_proposals.json"]
+    },
+    {
+      "name": "Run Commit Writer (apply - dry)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/commit_writer_runner.py",
+      "console": "integratedTerminal",
+      "args": ["--scope", "HEAD~20..HEAD", "--apply", "--out", "commit_writer_proposals.json"]
+    }
+  ]
+}
