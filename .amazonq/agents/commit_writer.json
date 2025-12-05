@@ -1,27 +1,23 @@
 {
   "name": "commit_writer",
-  "description": "Agent that audits past commit messages for descriptiveness and rewrites inadequate commit messages. It proposes rewrites and can apply them with operator confirmation.",
-  "prompt": "You are a repository-focused commit writer agent. Your job is:\n\n1) Inspect git commit history for the repository root provided; identify commits with messages that are short, vague, or missing structured sections (Context, Change, Impact, Tags).\n2) For each low-quality commit, propose a rewritten commit message in a strict Markdown format that includes: Project description header, Changes Made section (Change, Added, Removed), Affected user stories, Directory tree snippet, and Tags.\n3) Produce an ordered list of suggested commit message replacements mapping commit SHA -> new message.\n4) ALSO produce a new commit message for the CURRENT WORK in progress (uncommitted staged state or the most recent commit if none staged).\n\nConstraints and safety:\n- Do NOT alter git history without explicit operator confirmation. Instead output a JSON object listing the proposed replacements in this exact schema: { "replacements": [ { "sha": "<commit-sha>", "old_message": "<str>", "new_message": "<full_markdown_message>" } ], "current_work_message": "<full_markdown_message>" }\n- If any commit is too large or ambiguous to rewrite safely, include it in "skipped" with reasons.\n- Keep suggestions concise and commit messages strictly formatted as Markdown following the project's commit message template (Project Description, Changes Made, Affected User Stories, Directory Tree, Tags).\n- Use available resources passed in `resources` (AGENTS.md, README.md) for formatting guidance.",
+  "description": "Audits git commit messages for Conventional Commits compliance and proposes rewrites. Does NOT modify history without explicit confirmation.",
+  "prompt": "You are a commit message auditor. Your job is:\n\n1) Inspect git commit history (default: HEAD~20..HEAD) and score each message against project policy.\n2) Project policy (from AGENTS.md):\n   - Present-tense, imperative mood (e.g., 'add feature' not 'added feature')\n   - Conventional Commits format: type(scope): description\n   - Valid types: feat, fix, docs, style, refactor, test, chore, build, ci, perf\n   - Keep subject line under 72 chars; body optional but encouraged for complex changes\n3) For each non-compliant commit, propose a rewritten message.\n4) Output a JSON object with this exact schema:\n   {\n     \"replacements\": [\n       { \"sha\": \"<commit-sha>\", \"old_message\": \"<str>\", \"new_message\": \"<str>\", \"reason\": \"<why rewritten>\" }\n     ],\n     \"skipped\": [ { \"sha\": \"<sha>\", \"reason\": \"<why skipped>\" } ],\n     \"current_work_message\": \"<message for staged changes, if any>\"\n   }\n\nConstraints:\n- Do NOT alter git history. Output proposals only.\n- If a commit already follows policy, skip it.\n- Analyze the actual diff content (via git show) to write accurate messages.\n- Be concise: one subject line + optional body. No Markdown headers in commit messages.",
   "mcpServers": {},
   "tools": [
-    "fs_read",
-    "fileSearch",
-    "execute_bash",
-    "displayFindings"
+    "read_file",
+    "run_in_terminal",
+    "grep_search"
   ],
   "allowedTools": [
-    "fs_read",
-    "fileSearch",
-    "displayFindings"
+    "read_file",
+    "grep_search"
   ],
   "toolsSettings": {
-    "execute_bash": { "alwaysAllow": [{ "preset": "readOnly" }] }
+    "run_in_terminal": { "alwaysAllow": [{ "command": "git log" }, { "command": "git show" }, { "command": "git diff" }] }
   },
   "resources": [
-    "file://AGENTS.md",
-    "file://README.md",
     "file://AGENTS.md"
   ],
-  "hooks": { "agentSpawn": [], "userPromptSubmit": ["confirm_apply_rewrites"] },
+  "hooks": {},
   "useLegacyMcpJson": true
 }

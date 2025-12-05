@@ -1,30 +1,53 @@
 ---
-description: 'Commit writer agent — audits past commits and proposes rewritten commit messages in a strict format; applies rewrites only with explicit operator confirmation.'
+description: 'Commit writer agent — audits commits for Conventional Commits compliance and proposes rewrites; never modifies history without explicit confirmation.'
 tools:
-	- fs_read
-	- fileSearch
-	- execute_bash
+  - read_file
+  - run_in_terminal
+  - grep_search
 allowedTools:
-	- fs_read
-	- fileSearch
+  - read_file
+  - grep_search
 ---
-This agent inspects `git` commit history and staged changes, identifies commit messages that are not descriptive enough per project policy, proposes rewritten messages in a strict Markdown format, and (with operator approval) can apply those rewrites using safe, interactive git operations.  
 
-Input:
-- `repo_root` path or run in the workspace root (default).  
-- Optional `scope`: commit range (e.g., `HEAD~10..HEAD`) or `all`.  
+# Commit Writer Agent
 
-Output:
-- JSON object with `replacements` list mapping `sha`->`old_message`->`new_message` and `current_work_message` for the work-in-progress commit.
+Audits git commit messages against project policy and proposes rewrites for non-compliant commits.
 
-Safety & workflow:
-- The agent does NOT change commits by default. It outputs proposals and a suggested sequence of exact git commands to run (or a single `git rebase -i` plan).  
-- To apply rewrites automatically, the operator must confirm and a `userPromptSubmit` hook with type `confirm_apply_rewrites` must be approved.  
+## Policy (from AGENTS.md)
 
-Example CLI flow (safe):
-1) Run the agent to generate proposals.  
-2) Inspect proposals, iterate if needed.  
-3) Ask the agent to prepare an apply script.  
-4) Review and manually execute the apply script or approve the agent to run it.
+- **Format:** Conventional Commits — `type(scope): description`
+- **Mood:** Present-tense, imperative (e.g., "add feature" not "added feature")
+- **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`
+- **Length:** Subject ≤72 chars; body optional
 
-This file is a human-facing spec to show the agent in agent catalogs and give contributors clear usage guidance.
+## Input
+
+- `scope`: Commit range (default `HEAD~20..HEAD`) or `all`
+- Runs in workspace root
+
+## Output
+
+JSON object:
+```json
+{
+  "replacements": [
+    { "sha": "abc123", "old_message": "...", "new_message": "...", "reason": "..." }
+  ],
+  "skipped": [
+    { "sha": "def456", "reason": "already compliant" }
+  ],
+  "current_work_message": "feat(cli): add new template support"
+}
+```
+
+## Safety
+
+- **Read-only by default** — never modifies git history
+- Proposals only; operator must manually apply rewrites
+- Use `tools/commit_writer_runner.py` for local testing
+
+## Example Usage
+
+```
+Analyze my last 10 commits and propose rewrites for any that don't follow Conventional Commits.
+```
