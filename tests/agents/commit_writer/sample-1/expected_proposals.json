@@ -1,0 +1,11 @@
+{
+  "replacements": [
+    {
+      "sha": "419beaf",
+      "old_message": "init",
+      "new_message": "# Project Description\n\nInitialize project with base structure and templates.\n\n## Changes Made\n\n- **Change:** Project scaffolding created\n- **Added:** `llm.py`, `servers/`, `generated/`, `README.md`\n- **Removed:** None\n\n## Affected User Stories\n\n- Developers can start configuring MCP servers.\n\n## Directory Tree\n\n```.\n|-- llm.py\n|-- servers/\n|-- generated/\n`-- README.md\n```\n\n## Tags\n\n#init #project-setup"
+    }
+  ],
+  "skipped": [],
+  "current_work_message": null
+}

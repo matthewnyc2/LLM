@@ -1,0 +1,17 @@
+419beaf init
+43deb89 Add .gitignore for Python cache files and project-specific files
+d83576e Fix critical issues in llm.py identified by verification agents
+c12b91f docs: add AGENTS.md contributor guide
+59b6011 Consolidate to llm.py only and fix MCP server formatting
+6d024c3 Merge pull request #1 from matthewnyc2/claude/remove-main2-consolidate-01PkmrSTxJDvRRzKXYjuFFgV
+3092334 "Claude PR Assistant workflow"
+d5517bf "Claude Code Review workflow"
+cb27f6b "Claude PR Assistant workflow"
+de32911 "Claude Code Review workflow"
+46e0e79 Merge pull request #2 from matthewnyc2/add-claude-github-actions-1763354386381
+5857373 Fix cross-platform compatibility: Replace cmd with npx in JSON templates
+94aab01 Fix cross-platform compatibility in all JSON templates
+5857373 Fix cross-platform compatibility: Replace cmd with npx in JSON templates
+c619c80 Fix MCP server configurations for all LLMs and update metadata
+f9274a6 Merge pull request #7 from matthewnyc2/claude/verify-mcp-servers-01V8NVg3sJGrMFNLhCf1RHgR
+3b2919d wip: save all unstaged changes before rebase (2025-12-05T02:08:20.729Z)
