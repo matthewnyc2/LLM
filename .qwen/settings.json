@@ -1,11 +1,11 @@
 {
   "mcpServers": {
+    "context7": {
+      "httpUrl": "https://mcp.context7.com/mcp"
+    },
     "sequential-thinking": {
       "httpUrl": "https://server.smithery.ai/@smithery-ai/server-sequential-thinking/mcp"
-    },
-    "context7": {
-      "url": "https://mcp.context7.com/mcp",
-      "type": "http"
     }
-  }
+  },
+  "$version": 2
 }

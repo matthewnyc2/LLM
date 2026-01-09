@@ -15,12 +15,17 @@
   },
   "location_type": "windows",
   "last_batch_server": "kilo_code_mcp.json",
-  "selected_llm": "codex_config.toml::windows",
+  "selected_llm": "opencode_config.json::windows",
   "selected_mcp_servers": [
-    "sequential-thinking",
     "playwright-mcp.env",
     "context7",
-    "ref"
+    "sequential-thinking"
   ],
-  "last_batch_llm": null
+  "last_batch_llm": null,
+  "sync_os_modes": [
+    "windows"
+  ],
+  "claude_mcp_scope": "user",
+  "gemini_mcp_scope": "project",
+  "qwen_mcp_scope": "project"
 }

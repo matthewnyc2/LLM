@@ -2,15 +2,17 @@
 """Utility for assembling MCP server configuration files for multiple apps."""
 
 import copy
+import concurrent.futures
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Set
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 CONFIG_DIR = Path(__file__).resolve().parent
 SERVERS_DIR = CONFIG_DIR / "servers"
@@ -23,6 +25,10 @@ DEFAULT_CONFIG = {
     "last_batch_server": None,
     "selected_llm": None,
     "selected_mcp_servers": [],
+    "sync_os_modes": ["windows"],
+    "claude_mcp_scope": "user",    # local | user | project
+    "gemini_mcp_scope": "project", # user | project
+    "qwen_mcp_scope": "project",   # user | project
 }
 
 TEMPLATE_NAME_OVERRIDES = {
@@ -217,12 +223,286 @@ def load_config() -> Dict[str, object]:
     config.setdefault("last_batch_server", DEFAULT_CONFIG["last_batch_server"])
     config.setdefault("selected_llm", DEFAULT_CONFIG["selected_llm"])
     config.setdefault("selected_mcp_servers", DEFAULT_CONFIG["selected_mcp_servers"])
+    config.setdefault("sync_os_modes", DEFAULT_CONFIG["sync_os_modes"])
+    config.setdefault("claude_mcp_scope", DEFAULT_CONFIG["claude_mcp_scope"])
+    config.setdefault("gemini_mcp_scope", DEFAULT_CONFIG["gemini_mcp_scope"])
+    config.setdefault("qwen_mcp_scope", DEFAULT_CONFIG["qwen_mcp_scope"])
     return config
 
 
 def save_config(config: Dict[str, object]) -> None:
     with CONFIG_PATH.open("w", encoding="utf-8") as handle:
         json.dump(config, handle, indent=2)
+        handle.write("\n")
+
+
+def resolve_windows_executable(base: str) -> str:
+    """Resolve an executable name on Windows, preferring npm-style .cmd shims."""
+    if sys.platform != "win32":
+        return base
+    for candidate in (f"{base}.cmd", f"{base}.exe", f"{base}.ps1", base):
+        resolved = shutil.which(candidate)
+        if resolved:
+            return resolved
+    return base
+
+
+def run_process(args: Sequence[str], *, os_mode: str, cwd: Optional[Path] = None) -> Tuple[int, str, str]:
+    """Run a CLI command, returning (returncode, stdout, stderr)."""
+    final_args: List[str] = list(args)
+    if sys.platform == "win32" and os_mode == "wsl":
+        wsl_exe = shutil.which("wsl")
+        if not wsl_exe:
+            return 127, "", "wsl executable not found on PATH"
+        final_args = [wsl_exe, "-e", *final_args]
+    try:
+        proc = subprocess.run(
+            final_args,
+            cwd=str(cwd) if cwd else None,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return proc.returncode, (proc.stdout or "").strip(), (proc.stderr or "").strip()
+    except Exception as exc:
+        return 1, "", str(exc)
+
+
+def _format_headers(headers: Dict[str, str]) -> List[str]:
+    return [f"{key}: {value}" for key, value in headers.items()]
+
+
+def _parse_toml_string(value: str) -> Optional[str]:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == "\"" and value[-1] == "\"":
+        return value[1:-1]
+    return None
+
+
+def _parse_toml_array(value: str) -> Optional[List[str]]:
+    value = value.strip()
+    if not (value.startswith("[") and value.endswith("]")):
+        return None
+    inner = value[1:-1].strip()
+    if not inner:
+        return []
+    items: List[str] = []
+    for raw in inner.split(","):
+        raw = raw.strip()
+        parsed = _parse_toml_string(raw)
+        if parsed is None:
+            return None
+        items.append(parsed)
+    return items
+
+
+def _parse_codex_server_block(block_lines: Sequence[str]) -> Dict[str, object]:
+    """Parse a minimal subset of Codex TOML MCP server block lines."""
+    parsed: Dict[str, object] = {}
+    for line in block_lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("["):
+            continue
+        match = re.match(r"^([A-Za-z0-9_]+)\\s*=\\s*(.+)$", stripped)
+        if not match:
+            continue
+        key, value = match.group(1), match.group(2).strip()
+        if key in {"url", "command", "bearer_token_env_var"}:
+            as_str = _parse_toml_string(value)
+            if as_str is not None:
+                parsed[key] = as_str
+        elif key == "args":
+            as_list = _parse_toml_array(value)
+            if as_list is not None:
+                parsed[key] = as_list
+        elif key in {"http_headers", "env_http_headers"}:
+            parsed[key] = value
+    return parsed
+
+
+@dataclass
+class SyncResult:
+    client: str
+    os_mode: str
+    ok: bool
+    actions: List[str]
+    error: Optional[str] = None
+
+
+def sync_mcp_all_clients(templates: List["ServerTemplate"], config: Dict[str, object]) -> List[SyncResult]:
+    """
+    Sync selected MCP servers to all supported CLIs in parallel.
+
+    Uses each CLI's `mcp add/remove` commands where available.
+    """
+    selected_servers = set(config.get("selected_mcp_servers", []))
+    os_modes_value = config.get("sync_os_modes", ["windows"])
+    if isinstance(os_modes_value, str):
+        os_modes = [os_modes_value]
+    elif isinstance(os_modes_value, list):
+        os_modes = [str(item) for item in os_modes_value]
+    else:
+        os_modes = ["windows"]
+    template_index: Dict[Tuple[str, str], ServerTemplate] = {(t.filename, t.os_mode): t for t in templates}
+
+    targets: List[Tuple[str, str, ServerTemplate]] = []
+    for os_mode in os_modes:
+        for filename, client_id in (
+            ("codex_config.toml", "codex"),
+            ("claude_code_mcp.json", "claude"),
+            ("gemini_cli_mcp.json", "gemini"),
+            ("qwen_mcp.json", "qwen"),
+        ):
+            tmpl = template_index.get((filename, os_mode))
+            if tmpl:
+                targets.append((client_id, os_mode, tmpl))
+
+    def sync_one(client_id: str, os_mode: str, tmpl: ServerTemplate) -> SyncResult:
+        available = set(tmpl.server_blocks.keys())
+        remove_names = sorted(available - selected_servers)
+        add_names = sorted(available & selected_servers)
+        actions: List[str] = []
+
+        if client_id == "codex":
+            exe = resolve_windows_executable("codex")
+            for name in remove_names:
+                rc, out, err = run_process([exe, "mcp", "remove", name], os_mode=os_mode)
+                if rc == 0:
+                    actions.append(f"removed {name}")
+            for name in add_names:
+                block_lines = tmpl.server_blocks.get(name)
+                if not isinstance(block_lines, list):
+                    continue
+                spec = _parse_codex_server_block(block_lines)
+                url = spec.get("url")
+                command = spec.get("command")
+                args = spec.get("args") if isinstance(spec.get("args"), list) else []
+
+                if url and (spec.get("http_headers") or spec.get("env_http_headers")):
+                    actions.append(f"skipped {name} (headers unsupported by codex mcp add)")
+                    continue
+
+                run_process([exe, "mcp", "remove", name], os_mode=os_mode)
+                if isinstance(url, str):
+                    cmd = [exe, "mcp", "add", name, "--url", url]
+                    bearer = spec.get("bearer_token_env_var")
+                    if isinstance(bearer, str):
+                        cmd.extend(["--bearer-token-env-var", bearer])
+                    rc, out, err = run_process(cmd, os_mode=os_mode)
+                elif isinstance(command, str):
+                    cmd = [exe, "mcp", "add", name, "--", command, *[str(a) for a in args]]
+                    rc, out, err = run_process(cmd, os_mode=os_mode)
+                else:
+                    actions.append(f"skipped {name} (unrecognized codex block)")
+                    continue
+
+                if rc == 0:
+                    actions.append(f"added {name}")
+                else:
+                    actions.append(f"failed {name}")
+                    return SyncResult(client=client_id, os_mode=os_mode, ok=False, actions=actions, error=err or out)
+
+            return SyncResult(client=client_id, os_mode=os_mode, ok=True, actions=actions)
+
+        if client_id == "claude":
+            exe = resolve_windows_executable("claude")
+            scope = str(config.get("claude_mcp_scope", "user"))
+            for name in remove_names:
+                rc, out, err = run_process([exe, "mcp", "remove", "--scope", scope, name], os_mode=os_mode)
+                if rc == 0:
+                    actions.append(f"removed {name}")
+            for name in add_names:
+                server = tmpl.server_blocks.get(name)
+                if not isinstance(server, dict):
+                    continue
+                run_process([exe, "mcp", "remove", "--scope", scope, name], os_mode=os_mode)
+
+                headers = _format_headers(server.get("headers", {}) or {})
+                env = server.get("env", {}) or {}
+
+                if "url" in server or "httpUrl" in server:
+                    url = server.get("httpUrl") or server.get("url")
+                    cmd = [exe, "mcp", "add", "--scope", scope, "--transport", "http"]
+                    for header in headers:
+                        cmd.extend(["--header", header])
+                    cmd.extend([name, str(url)])
+                else:
+                    cmd = [exe, "mcp", "add", "--scope", scope, "--transport", "stdio"]
+                    if isinstance(env, dict):
+                        for key, value in env.items():
+                            cmd.extend(["--env", f"{key}={value}"])
+                    command = server.get("command")
+                    args = server.get("args", []) or []
+                    cmd.extend([name, "--", str(command), *[str(a) for a in args]])
+
+                rc, out, err = run_process(cmd, os_mode=os_mode)
+                if rc == 0:
+                    actions.append(f"added {name}")
+                else:
+                    actions.append(f"failed {name}")
+                    return SyncResult(client=client_id, os_mode=os_mode, ok=False, actions=actions, error=err or out)
+
+            return SyncResult(client=client_id, os_mode=os_mode, ok=True, actions=actions)
+
+        if client_id in {"gemini", "qwen"}:
+            exe = resolve_windows_executable(client_id)
+            scope_key = "gemini_mcp_scope" if client_id == "gemini" else "qwen_mcp_scope"
+            scope = str(config.get(scope_key, "project"))
+
+            for name in remove_names:
+                rc, out, err = run_process([exe, "mcp", "remove", "--scope", scope, name], os_mode=os_mode)
+                if rc == 0:
+                    actions.append(f"removed {name}")
+
+            for name in add_names:
+                server = tmpl.server_blocks.get(name)
+                if not isinstance(server, dict):
+                    continue
+                run_process([exe, "mcp", "remove", "--scope", scope, name], os_mode=os_mode)
+
+                headers = _format_headers(server.get("headers", {}) or {})
+                env = server.get("env", {}) or {}
+                timeout = server.get("timeout")
+
+                if "url" in server or "httpUrl" in server:
+                    url = server.get("httpUrl") or server.get("url")
+                    transport = "http" if "httpUrl" in server else "sse"
+                    cmd = [exe, "mcp", "add", "--scope", scope, "--transport", transport]
+                    for header in headers:
+                        cmd.extend(["--header", header])
+                    if isinstance(timeout, int):
+                        cmd.extend(["--timeout", str(timeout)])
+                    cmd.extend([name, str(url)])
+                else:
+                    cmd = [exe, "mcp", "add", "--scope", scope, "--transport", "stdio"]
+                    if isinstance(env, dict):
+                        for key, value in env.items():
+                            cmd.extend(["--env", f"{key}={value}"])
+                    command = server.get("command")
+                    args = server.get("args", []) or []
+                    cmd.extend([name, str(command), *[str(a) for a in args]])
+
+                rc, out, err = run_process(cmd, os_mode=os_mode)
+                if rc == 0:
+                    actions.append(f"added {name}")
+                else:
+                    actions.append(f"failed {name}")
+                    return SyncResult(client=client_id, os_mode=os_mode, ok=False, actions=actions, error=err or out)
+
+            return SyncResult(client=client_id, os_mode=os_mode, ok=True, actions=actions)
+
+        return SyncResult(client=client_id, os_mode=os_mode, ok=False, actions=actions, error="unsupported client")
+
+    if not targets:
+        return []
+
+    results: List[SyncResult] = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(8, len(targets))) as executor:
+        futures = [executor.submit(sync_one, client_id, os_mode, tmpl) for client_id, os_mode, tmpl in targets]
+        for future in concurrent.futures.as_completed(futures):
+            results.append(future.result())
+    results.sort(key=lambda r: (r.client, r.os_mode))
+    return results
 
 
 def log_history(event: str, details: Optional[Dict[str, object]] = None) -> None:
@@ -277,7 +557,7 @@ def load_json_template(path: Path, os_mode: str) -> ServerTemplate:
     os_data = data[os_mode]
     
     container_key = None
-    for key in ("mcpServers", "mcp_servers", "mcp"):
+    for key in ("mcpServers", "mcp_servers", "mcp", "servers"):
         if key in os_data:
             container_key = key
             break
@@ -520,9 +800,25 @@ def select_mcp_servers(templates: List[ServerTemplate], config: Dict[str, object
     config["selected_mcp_servers"] = list(selected_servers)
     save_config(config)
 
+    clear_screen()
+    print_centered("Syncing MCP servers to all supported CLIs...")
+    print()
+    results = sync_mcp_all_clients(templates, config)
+    if not results:
+        print("No supported CLI targets found for the selected OS modes.")
+        input("Press Enter to continue...")
+        return
+    for result in results:
+        status = "✓" if result.ok else "✗"
+        print(f"{status} {result.client} ({result.os_mode})")
+        if result.error:
+            print(f"    {result.error}")
+    print()
+    input("Press Enter to continue...")
+
 
 def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, object]) -> None:
-    """Launch LLM and replace its config with selected MCP servers."""
+    """Launch the selected CLI (MCP servers are synced separately)."""
     selected_id = config.get("selected_llm")
     if not selected_id:
         print("No LLM selected. Please select an LLM first.\n")
@@ -541,73 +837,9 @@ def launch_llm_with_config(templates: List[ServerTemplate], config: Dict[str, ob
         input("Press Enter to continue...")
         return
     
-    selected_servers = config.get("selected_mcp_servers", [])
-    
-    # Generate config with selected servers
-    output_directory = Path(config.get("output_directory", "generated"))
-    if not output_directory.is_absolute():
-        output_directory = CONFIG_DIR / output_directory
-    output_directory.mkdir(parents=True, exist_ok=True)
-    
-    # Output filename might need to be unique if we have multiple configs for same file?
-    # But usually we just overwrite the target.
-    # For generated file, let's keep original filename.
-    output_path = output_directory / template.filename
-    
-    # Create new server blocks with only selected servers
-    filtered_blocks = {}
-    for server in selected_servers:
-        if server in template.server_blocks:
-            filtered_blocks[server] = template.server_blocks[server]
-    
-    # Create temporary template with filtered servers
-    # We can reuse the template object but with filtered blocks
-    temp_template = ServerTemplate(
-        filename=template.filename,
-        display_name=template.display_name,
-        path=template.path,
-        format=template.format,
-        os_mode=template.os_mode,
-        server_order=[s for s in template.server_order if s in selected_servers],
-        server_blocks=filtered_blocks,
-        metadata=template.metadata,
-        container_key=template.container_key,
-        header_lines=template.header_lines,
-    )
-    
-    document = temp_template.render(selected_servers)
-    with output_path.open("w", encoding="utf-8") as handle:
-        handle.write(document)
-    
-    # Copy to app locations (both OS-specific and project-specific)
-    # 1. Deploy to OS-specific location (windows/wsl)
-    locations = APP_LOCATIONS.get(template.os_mode, {})
-    if template.filename in locations:
-        app_location_raw = locations[template.filename]
-        app_location = Path(os.path.expandvars(app_location_raw)).expanduser()
-        app_location.parent.mkdir(parents=True, exist_ok=True)
-        
-        try:
-            shutil.copy2(output_path, app_location)
-            print(f"✓ Updated config at {app_location}")
-        except Exception as exc:
-            print(f"✗ Failed to copy config to {app_location}: {exc}")
-    else:
-        print(f"No configuration path defined for {template.filename} in {template.os_mode}")
-    
-    # 2. Deploy to project-specific location
-    project_locations = get_project_locations()
-    if template.filename in project_locations:
-        project_location = Path(project_locations[template.filename])
-        project_location.parent.mkdir(parents=True, exist_ok=True)
-        
-        try:
-            shutil.copy2(output_path, project_location)
-            print(f"✓ Updated project config at {project_location}")
-        except Exception as exc:
-            print(f"✗ Failed to copy to project location {project_location}: {exc}")
+    # MCP servers are synced via each CLI's `mcp add/remove` commands (handled in
+    # `select_mcp_servers`). Launching a CLI no longer rewrites config files.
 
-    
     # Launch LLM
     cli_key = template.filename.replace(".json", "").replace(".toml", "").replace("_mcp", "").replace("_settings", "").replace("_config", "")
     cli_map = {
@@ -771,11 +1003,12 @@ def show_main_menu(config: Dict[str, object]) -> None:
     
     print("Options:")
     print("  1. Select LLM Application")
-    print("  2. Select MCP Servers") 
-    print("  3. Launch Application")
-    print("  4. Batch Commands")
-    print("  5. History")
-    print("  6. Exit")
+    print("  2. Select MCP Servers (sync all)")
+    print("  3. Sync MCP Servers (re-apply)")
+    print("  4. Launch Application")
+    print("  5. Batch Commands")
+    print("  6. History")
+    print("  7. Exit")
     print()
 
 
@@ -816,11 +1049,12 @@ def main() -> None:
         # Centered options? Or just left aligned in center?
         # Let's keep standard left aligned menu for readability
         print("  1. Select LLM Application")
-        print("  2. Select MCP Servers") 
-        print("  3. Launch Application")
-        print("  4. Batch Commands")
-        print("  5. History")
-        print("  6. Exit")
+        print("  2. Select MCP Servers (sync all)")
+        print("  3. Sync MCP Servers (re-apply)")
+        print("  4. Launch Application")
+        print("  5. Batch Commands")
+        print("  6. History")
+        print("  7. Exit")
         print()
         
         choice = input("Choose an option: ").strip()
@@ -830,13 +1064,28 @@ def main() -> None:
         elif choice == "2":
             select_mcp_servers(templates, config)
         elif choice == "3":
-            launch_llm_with_config(templates, config)
+            clear_screen()
+            print_centered("Syncing MCP servers to all supported CLIs...")
+            print()
+            results = sync_mcp_all_clients(templates, config)
+            if not results:
+                print("No supported CLI targets found for the selected OS modes.")
+            else:
+                for result in results:
+                    status = "✓" if result.ok else "✗"
+                    print(f"{status} {result.client} ({result.os_mode})")
+                    if result.error:
+                        print(f"    {result.error}")
+            print()
+            input("Press Enter to continue...")
         elif choice == "4":
-            batch_commands(templates, config)
+            launch_llm_with_config(templates, config)
         elif choice == "5":
+            batch_commands(templates, config)
+        elif choice == "6":
             display_history()
             input("Press Enter to continue...")
-        elif choice == "6":
+        elif choice == "7":
             print("Goodbye!")
             break
         else:

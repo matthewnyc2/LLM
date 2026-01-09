@@ -1,0 +1,104 @@
+{
+  "name": "q_ide_default",
+  "description": "Default agent configuration",
+  "prompt": "",
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@microsoft/playwright-mcp"
+      ]
+    },
+    "ref": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ref-tools-mcp"
+      ]
+    },
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander"
+      ]
+    },
+    "sequential-thinking": {},
+    "context7": {},
+    "zen": {
+      "command": "uvx",
+      "args": [
+        "zen-mcp"
+      ]
+    },
+    "gemini-cli-server": {
+      "command": "gemini",
+      "args": [
+        "mcp",
+        "server"
+      ]
+    }
+  },
+  "tools": [
+    "fs_read",
+    "execute_bash",
+    "fs_write",
+    "report_issue",
+    "use_aws",
+    "@playwright",
+    "@ref",
+    "@desktop-commander",
+    "@sequential-thinking",
+    "@context7",
+    "@zen",
+    "@gemini-cli-server",
+    "fsRead",
+    "fsWrite",
+    "fsReplace",
+    "listDirectory",
+    "fileSearch",
+    "executeBash",
+    "codeReview",
+    "displayFindings"
+  ],
+  "toolAliases": {},
+  "allowedTools": [
+    "fs_read",
+    "report_issue",
+    "use_aws",
+    "execute_bash",
+    "fs_write",
+    "fsRead",
+    "listDirectory",
+    "fileSearch",
+    "codeReview",
+    "displayFindings"
+  ],
+  "toolsSettings": {
+    "use_aws": {
+      "alwaysAllow": [
+        {
+          "preset": "readOnly"
+        }
+      ]
+    },
+    "execute_bash": {
+      "alwaysAllow": [
+        {
+          "preset": "readOnly"
+        }
+      ]
+    }
+  },
+  "resources": [
+    "file://AmazonQ.md",
+    "file://README.md",
+    "file://.amazonq/rules/**/*.md"
+  ],
+  "hooks": {
+    "agentSpawn": [],
+    "userPromptSubmit": []
+  },
+  "useLegacyMcpJson": true
+}

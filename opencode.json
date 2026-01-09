@@ -1,29 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@microsoft/playwright-mcp"
-      ]
-    },
-    "ref": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "ref-tools-mcp"
-      ]
-    },
-    "desktop-commander": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@wonderwhy-er/desktop-commander"
-      ]
+    "exa": {
+      "type": "remote",
+      "url": "https://server.smithery.ai/exa/mcp",
+      "headers": {
+        "SMITHERY_PROFILE": "{env:SMITHERY_PROFILE}",
+        "SMITHERY_API_KEY": "{env:SMITHERY_API_KEY}"
+      }
     },
     "sequential-thinking": {
       "type": "remote",
@@ -32,21 +16,6 @@
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp"
-    },
-    "zen": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "zen-mcp"
-      ]
-    },
-    "gemini-cli-server": {
-      "type": "stdio",
-      "command": "gemini",
-      "args": [
-        "mcp",
-        "server"
-      ]
     }
   }
 }

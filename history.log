@@ -129,3 +129,6 @@
 {"timestamp": "2025-11-29T06:54:18", "event": "launch_llm", "details": {"template": "qwen_mcp.json::wsl", "command": "/home/matt/.nvm/versions/node/v25.2.1/bin/qwen"}}
 {"timestamp": "2025-11-29T18:59:37", "event": "launch_llm", "details": {"template": "claude_code_mcp.json::windows", "command": "claude"}}
 {"timestamp": "2025-12-03T20:26:48", "event": "launch_llm", "details": {"template": "codex_config.toml::windows", "command": "C:\\Users\\matt\\AppData\\Roaming\\npm\\codex.cmd"}}
+{"timestamp": "2025-12-07T08:44:26", "event": "launch_llm", "details": {"template": "codex_config.toml::windows", "command": "C:\\Users\\matt\\AppData\\Roaming\\npm\\codex.cmd"}}
+{"timestamp": "2025-12-20T06:44:27", "event": "launch_llm", "details": {"template": "opencode_config.json::windows", "command": "C:\\Users\\matt\\AppData\\Roaming\\npm\\opencode.cmd"}}
+{"timestamp": "2025-12-20T07:41:46", "event": "launch_llm", "details": {"template": "opencode_config.json::windows", "command": "C:\\Users\\matt\\AppData\\Roaming\\npm\\opencode.cmd"}}
